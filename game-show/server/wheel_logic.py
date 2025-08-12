@@ -9,19 +9,19 @@ from typing import Dict, List, Tuple, Optional
 
 class WheelLogic:
     def __init__(self):
-        # Game show wheel segments with special actions
+        # Game show wheel segments with special actions - no styling concerns
         self.segments = [
-            {"id": 0, "text": "New Rule", "action": "new_rule", "color": "#FF6B6B", "angle": 0},
-            {"id": 1, "text": "New Rule", "action": "new_rule", "color": "#4ECDC4", "angle": 30},
-            {"id": 2, "text": "New Rule", "action": "new_rule", "color": "#45B7D1", "angle": 60},
-            {"id": 3, "text": "Modify: Audience Choice", "action": "audience_choice", "color": "#96CEB4", "angle": 90},
-            {"id": 4, "text": "Modify: Audience Choice", "action": "audience_choice", "color": "#FFEAA7", "angle": 120},
-            {"id": 5, "text": "Challenge", "action": "challenge", "color": "#DDA0DD", "angle": 150},
-            {"id": 6, "text": "Challenge", "action": "challenge", "color": "#98D8C8", "angle": 180},
-            {"id": 7, "text": "Challenge", "action": "challenge", "color": "#F7DC6F", "angle": 210},
-            {"id": 8, "text": "Modify: Duplicate", "action": "duplicate", "color": "#FF9F43", "angle": 240},
-            {"id": 9, "text": "Modify: Reverse", "action": "reverse", "color": "#A29BFE", "angle": 270},
-            {"id": 10, "text": "Modify: Swap", "action": "swap", "color": "#FD79A8", "angle": 300}
+            {"id": 0, "text": "New Rule", "action": "new_rule", "angle": 0},
+            {"id": 1, "text": "New Rule", "action": "new_rule", "angle": 30},
+            {"id": 2, "text": "New Rule", "action": "new_rule", "angle": 60},
+            {"id": 3, "text": "Modify: Audience Choice", "action": "audience_choice", "angle": 90},
+            {"id": 4, "text": "Modify: Audience Choice", "action": "audience_choice", "angle": 120},
+            {"id": 5, "text": "Challenge", "action": "challenge", "angle": 150},
+            {"id": 6, "text": "Challenge", "action": "challenge", "angle": 180},
+            {"id": 7, "text": "Challenge", "action": "challenge", "angle": 210},
+            {"id": 8, "text": "Modify: Duplicate", "action": "duplicate", "angle": 240},
+            {"id": 9, "text": "Modify: Reverse", "action": "reverse", "angle": 270},
+            {"id": 10, "text": "Modify: Swap", "action": "swap", "angle": 300}
         ]
         
         self.current_segment = None
@@ -40,7 +40,7 @@ class WheelLogic:
         """Get the currently selected segment"""
         return self.current_segment
     
-    def add_segment(self, text: str, action: str, color: str) -> bool:
+    def add_segment(self, text: str, action: str) -> bool:
         """Add a new segment to the wheel"""
         if len(self.segments) >= 12:  # Limit to 12 segments
             return False
@@ -52,7 +52,6 @@ class WheelLogic:
             "id": new_id,
             "text": text,
             "action": action,
-            "color": color,
             "angle": angle
         }
         

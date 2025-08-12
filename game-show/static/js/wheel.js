@@ -33,8 +33,8 @@ function initializeWheel() {
     wheelContext = wheelCanvas.getContext('2d');
     if (!wheelContext) return;
     
-    // Set canvas size
-    const size = 400;
+    // Set canvas size - now 600x600 for TV display
+    const size = 600;
     wheelCanvas.width = size;
     wheelCanvas.height = size;
     
@@ -67,6 +67,8 @@ async function loadWheelSegments() {
                     
                     const data = await response.json();
                     wheelSegments = data.segments;
+                    // Apply medieval colors to API segments
+                    applyMedievalColors();
                     drawWheel();
                     return;
                 } catch (fetchError) {
@@ -79,24 +81,56 @@ async function loadWheelSegments() {
         
         const data = await GameShow.apiCall('/api/wheel/segments');
         wheelSegments = data.segments;
+        // Apply medieval colors to API segments
+        applyMedievalColors();
         drawWheel();
     } catch (error) {
         // Use default segments if API fails
         wheelSegments = [
-            { id: 0, text: "New Rule", action: "new_rule", color: "#DC143C", angle: 0 },           // Crimson
-            { id: 1, text: "New Rule", action: "new_rule", color: "#228B22", angle: 30 },         // Forest Green
-            { id: 2, text: "New Rule", action: "new_rule", color: "#9CAF88", angle: 60 },         // Sage Green
-            { id: 3, text: "Modify: Audience Choice", action: "audience_choice", color: "#8FBC8F", angle: 90 }, // Muted Green
-            { id: 4, text: "Modify: Audience Choice", action: "audience_choice", color: "#F0E68C", angle: 120 }, // Warm Yellow
-            { id: 5, text: "Challenge", action: "challenge", color: "#D2B48C", angle: 150 },       // Tan
-            { id: 6, text: "Challenge", action: "challenge", color: "#654321", angle: 180 },       // Deep Brown
-            { id: 7, text: "Challenge", action: "challenge", color: "#DAA520", angle: 210 },       // Goldenrod
-            { id: 8, text: "Modify: Duplicate", action: "duplicate", color: "#8B4513", angle: 240 }, // Saddle Brown
-            { id: 9, text: "Modify: Reverse", action: "reverse", color: "#556B2F", angle: 270 },   // Dark Olive Green
-            { id: 10, text: "Modify: Swap", action: "swap", color: "#4682B4", angle: 300 }        // Steel Blue
+            { id: 0, text: "New Rule", action: "new_rule", angle: 0 },
+            { id: 1, text: "New Rule", action: "new_rule", angle: 30 },
+            { id: 2, text: "New Rule", action: "new_rule", angle: 60 },
+            { id: 3, text: "Modify: Audience Choice", action: "audience_choice", angle: 90 },
+            { id: 4, text: "Modify: Audience Choice", action: "audience_choice", angle: 120 },
+            { id: 5, text: "Challenge", action: "challenge", angle: 150 },
+            { id: 6, text: "Challenge", action: "challenge", angle: 180 },
+            { id: 7, text: "Challenge", action: "challenge", angle: 210 },
+            { id: 8, text: "Modify: Duplicate", action: "duplicate", angle: 240 },
+            { id: 9, text: "Modify: Reverse", action: "reverse", angle: 270 },
+            { id: 10, text: "Modify: Swap", action: "swap", angle: 300 }
         ];
+        
+        // Apply colors to fallback segments
+        applyMedievalColors();
         drawWheel();
     }
+}
+
+// Function to get CSS variable value
+function getCSSVariable(name) {
+    return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+}
+
+// Function to get color based on segment action
+function getColorForAction(action) {
+    const actionColors = {
+        'new_rule': getCSSVariable('--accent-color'),           // Crimson
+        'audience_choice': getCSSVariable('--muted-green'),     // Muted Green
+        'challenge': getCSSVariable('--deep-brown'),            // Deep Brown
+        'duplicate': getCSSVariable('--primary-color'),         // Saddle Brown
+        'reverse': getCSSVariable('--secondary-color'),         // Dark Olive Green
+        'swap': getCSSVariable('--info-color')                  // Steel Blue
+    };
+    
+    return actionColors[action] || getCSSVariable('--tan-color');
+}
+
+// Function to apply medieval colors to wheel segments
+function applyMedievalColors() {
+    // Apply colors based on segment actions
+    wheelSegments.forEach((segment, index) => {
+        segment.color = getColorForAction(segment.action);
+    });
 }
 
 function drawWheel() {
@@ -139,8 +173,8 @@ function drawWheel() {
         
         wheelContext.save();
         wheelContext.translate(textX, textY);
-        // Rotate text to be vertical (perpendicular to radius)
-        wheelContext.rotate(textAngle + Math.PI / 2);
+        // Rotate text to be vertical like a wheel spoke (from center to edge)
+        wheelContext.rotate(textAngle);
         
         // Text styling with medieval font
         wheelContext.fillStyle = '#ffffff';

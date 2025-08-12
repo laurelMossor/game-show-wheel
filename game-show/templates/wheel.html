@@ -10,33 +10,21 @@
 <div class="wheel-container">
     <div class="row">
         <div class="col-12">
-            <h1 class="text-center mb-4 game-show-title">
+            <h1 class="text-center mb-3 game-show-title">
                 <i class="fas fa-circle-notch"></i> Spinning Wheel of Fortune
             </h1>
         </div>
     </div>
 
-    <!-- User Directions Banner -->
-    <div class="row">
-        <div class="col-12">
-            <div class="user-directions-banner">
-                <h3><i class="fas fa-info-circle"></i> How to Use the Wheel</h3>
-                <div class="directions-content">
-                    <p><strong>Spin the Wheel:</strong> Click the <span class="shortcut">SPIN THE WHEEL!</span> button or press <span class="shortcut">Space</span> or <span class="shortcut">Enter</span></p>
-                    <p><strong>After Spin:</strong> Click <span class="shortcut">Add Points</span> then select a player to award points</p>
-                    <p><strong>Keyboard Shortcuts:</strong> <span class="shortcut">1</span>, <span class="shortcut">2</span>, or <span class="shortcut">3</span> to quickly select players</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- Wheel Display -->
     <div class="row justify-content-center">
-        <div class="col-md-8">
+        <div class="col-md-10">
             <div class="wheel-section text-center">
                 <div class="wheel-wrapper">
-                    <canvas id="wheel-canvas" width="400" height="400"></canvas>
-                    <div class="wheel-pointer"></div>
+                    <canvas id="wheel-canvas" width="600" height="600"></canvas>
+                    <div class="wheel-pointer">
+                        <i class="fas fa-seedling" style="color: var(--accent-color); font-size: 2rem; filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5));"></i>
+                    </div>
                 </div>
                 
                 <div class="wheel-controls mt-4">
@@ -47,9 +35,25 @@
             </div>
         </div>
     </div>
+
+    <!-- User Directions Banner -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="user-directions-banner">
+                <h3><i class="fas fa-info-circle"></i> How to Use the Wheel</h3>
+                <div class="directions-content">
+                    <p><strong>Spin the Wheel:</strong> Click the <span class="shortcut">SPIN THE WHEEL!</span> button or press <span class="shortcut">Space</span> or <span class="shortcut">Enter</span></p>
+                    <p><strong>After Spin:</strong> Click <span class="shortcut">Add Points</span> then select a player to award points</p>
+                    <p><strong>Keyboard Shortcuts:</strong> <span class="shortcut">1</span>, <span class="shortcut">2</span>, or <span class="shortcut">3</span> to quickly select players</p>
+                    <p><strong>Navigation:</strong> Use <span class="shortcut">F1</span> for Scores, <span class="shortcut">F2</span> for Wheel</p>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}
 
 {% block extra_js %}
+<script src="{{ url_for('static', filename='js/color-config.js') }}"></script>
 <script src="{{ url_for('static', filename='js/wheel.js') }}"></script>
 {% endblock %}
