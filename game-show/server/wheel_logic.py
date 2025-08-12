@@ -7,27 +7,36 @@ import random
 import math
 from typing import Dict, List, Tuple, Optional
 
+# Default wheel segments configuration
+DEFAULT_SEGMENTS = [
+    {"id": 0, "text": "New Rule", "action": "new_rule", "angle": 0},
+    {"id": 1, "text": "New Rule", "action": "new_rule", "angle": 30},
+    {"id": 2, "text": "New Rule", "action": "new_rule", "angle": 60},
+    {"id": 3, "text": "Modify: Audience Choice", "action": "audience_choice", "angle": 90},
+    {"id": 4, "text": "Modify: Audience Choice", "action": "audience_choice", "angle": 120},
+    {"id": 5, "text": "Challenge", "action": "challenge", "angle": 150},
+    {"id": 6, "text": "Challenge", "action": "challenge", "angle": 180},
+    {"id": 7, "text": "Challenge", "action": "challenge", "angle": 210},
+    {"id": 8, "text": "Modify: Duplicate", "action": "duplicate", "angle": 240},
+    {"id": 9, "text": "Modify: Reverse", "action": "reverse", "angle": 270},
+    {"id": 10, "text": "Modify: Swap", "action": "swap", "angle": 300}
+]
+
+# Configuration constants
+MAX_SEGMENTS = 12
+DEFAULT_SPIN_DURATION = 3000
+DEFAULT_MIN_SPINS = 3
+ANGLE_RANDOMNESS = 15
+
 class WheelLogic:
     def __init__(self):
         # Game show wheel segments with special actions - no styling concerns
-        self.segments = [
-            {"id": 0, "text": "New Rule", "action": "new_rule", "angle": 0},
-            {"id": 1, "text": "New Rule", "action": "new_rule", "angle": 30},
-            {"id": 2, "text": "New Rule", "action": "new_rule", "angle": 60},
-            {"id": 3, "text": "Modify: Audience Choice", "action": "audience_choice", "angle": 90},
-            {"id": 4, "text": "Modify: Audience Choice", "action": "audience_choice", "angle": 120},
-            {"id": 5, "text": "Challenge", "action": "challenge", "angle": 150},
-            {"id": 6, "text": "Challenge", "action": "challenge", "angle": 180},
-            {"id": 7, "text": "Challenge", "action": "challenge", "angle": 210},
-            {"id": 8, "text": "Modify: Duplicate", "action": "duplicate", "angle": 240},
-            {"id": 9, "text": "Modify: Reverse", "action": "reverse", "angle": 270},
-            {"id": 10, "text": "Modify: Swap", "action": "swap", "angle": 300}
-        ]
+        self.segments = DEFAULT_SEGMENTS.copy()
         
         self.current_segment = None
         self.is_spinning = False
-        self.spin_duration = 3000  # milliseconds
-        self.min_spins = 3  # minimum number of full rotations
+        self.spin_duration = DEFAULT_SPIN_DURATION
+        self.min_spins = DEFAULT_MIN_SPINS
         
         # Initialize angles properly
         self._recalculate_angles()
@@ -42,7 +51,7 @@ class WheelLogic:
     
     def add_segment(self, text: str, action: str) -> bool:
         """Add a new segment to the wheel"""
-        if len(self.segments) >= 12:  # Limit to 12 segments
+        if len(self.segments) >= MAX_SEGMENTS:
             return False
         
         new_id = max(segment["id"] for segment in self.segments) + 1
@@ -75,29 +84,31 @@ class WheelLogic:
         
         self.is_spinning = True
         
-        # Select random segment
-        selected_segment = random.choice(self.segments)
-        self.current_segment = selected_segment
-        
-        # Calculate final rotation angle
-        final_angle = self._calculate_final_angle(selected_segment)
-        
-        # Simulate spin result
-        result = {
-            "segment": selected_segment,
-            "final_angle": final_angle,
-            "duration": self.spin_duration,
-            "min_spins": self.min_spins
-        }
-        
-        self.is_spinning = False
-        return result
+        try:
+            # Select random segment
+            selected_segment = random.choice(self.segments)
+            self.current_segment = selected_segment
+            
+            # Calculate final rotation angle
+            final_angle = self._calculate_final_angle(selected_segment)
+            
+            # Simulate spin result
+            result = {
+                "segment": selected_segment,
+                "final_angle": final_angle,
+                "duration": self.spin_duration,
+                "min_spins": self.min_spins
+            }
+            
+            return result
+        finally:
+            self.is_spinning = False
     
     def _calculate_final_angle(self, segment: Dict) -> float:
         """Calculate the final rotation angle for a segment"""
         # Add some randomness to make it feel more natural
         base_angle = segment["angle"]
-        random_offset = random.uniform(-15, 15)  # ±15 degrees randomness
+        random_offset = random.uniform(-ANGLE_RANDOMNESS, ANGLE_RANDOMNESS)
         final_angle = base_angle + random_offset
         
         # Ensure angle is between 0 and 360
@@ -130,3 +141,9 @@ class WheelLogic:
             "spin_duration": self.spin_duration,
             "min_spins": self.min_spins
         }
+    
+    def reset_to_defaults(self) -> None:
+        """Reset wheel to default segments"""
+        self.segments = DEFAULT_SEGMENTS.copy()
+        self._recalculate_angles()
+        self.current_segment = None

@@ -33,8 +33,8 @@ function initializeWheel() {
     wheelContext = wheelCanvas.getContext('2d');
     if (!wheelContext) return;
     
-    // Set canvas size - now 600x600 for TV display
-    const size = 600;
+    // Set canvas size from configuration
+    const size = window.WheelConfig?.WHEEL_CONFIG.CANVAS_SIZE || 600;
     wheelCanvas.width = size;
     wheelCanvas.height = size;
     
@@ -46,6 +46,7 @@ function setupWheelControls() {
     // Spin button
     const spinButton = document.querySelector('#spin-button');
     if (spinButton) {
+        GameShowUtils.initializeButtonState(spinButton);
         spinButton.addEventListener('click', function(e) {
             e.preventDefault();
             spinWheel();
@@ -66,9 +67,8 @@ async function loadWheelSegments() {
                     }
                     
                     const data = await response.json();
-                    wheelSegments = data.segments;
-                    // Apply medieval colors to API segments
-                    applyMedievalColors();
+                    // Randomize the segments from the API
+                    wheelSegments = randomizeSegments(data.segments);
                     drawWheel();
                     return;
                 } catch (fetchError) {
@@ -80,65 +80,52 @@ async function loadWheelSegments() {
         }
         
         const data = await GameShow.apiCall('/api/wheel/segments');
-        wheelSegments = data.segments;
-        // Apply medieval colors to API segments
-        applyMedievalColors();
+        // Randomize the segments from the API
+        wheelSegments = randomizeSegments(data.segments);
         drawWheel();
     } catch (error) {
-        // Use default segments if API fails
-        wheelSegments = [
-            { id: 0, text: "New Rule", action: "new_rule", angle: 0 },
-            { id: 1, text: "New Rule", action: "new_rule", angle: 30 },
-            { id: 2, text: "New Rule", action: "new_rule", angle: 60 },
-            { id: 3, text: "Modify: Audience Choice", action: "audience_choice", angle: 90 },
-            { id: 4, text: "Modify: Audience Choice", action: "audience_choice", angle: 120 },
-            { id: 5, text: "Challenge", action: "challenge", angle: 150 },
-            { id: 6, text: "Challenge", action: "challenge", angle: 180 },
-            { id: 7, text: "Challenge", action: "challenge", angle: 210 },
-            { id: 8, text: "Modify: Duplicate", action: "duplicate", angle: 240 },
-            { id: 9, text: "Modify: Reverse", action: "reverse", angle: 270 },
-            { id: 10, text: "Modify: Swap", action: "swap", angle: 300 }
-        ];
-        
-        // Apply colors to fallback segments
-        applyMedievalColors();
+        // Use randomized default segments if API fails
+        wheelSegments = window.WheelConfig?.randomizeWheel() || [];
         drawWheel();
     }
 }
 
-// Function to get CSS variable value
-function getCSSVariable(name) {
-    return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-}
-
-// Function to get color based on segment action
-function getColorForAction(action) {
-    const actionColors = {
-        'new_rule': getCSSVariable('--accent-color'),           // Crimson
-        'audience_choice': getCSSVariable('--muted-green'),     // Muted Green
-        'challenge': getCSSVariable('--deep-brown'),            // Deep Brown
-        'duplicate': getCSSVariable('--primary-color'),         // Saddle Brown
-        'reverse': getCSSVariable('--secondary-color'),         // Dark Olive Green
-        'swap': getCSSVariable('--info-color')                  // Steel Blue
-    };
+// Function to randomize segments and assign random colors
+function randomizeSegments(segments) {
+    if (!segments || !segments.length) {
+        return window.WheelConfig?.randomizeWheel() || [];
+    }
     
-    return actionColors[action] || getCSSVariable('--tan-color');
-}
-
-// Function to apply medieval colors to wheel segments
-function applyMedievalColors() {
-    // Apply colors based on segment actions
-    wheelSegments.forEach((segment, index) => {
-        segment.color = getColorForAction(segment.action);
+    // Create a copy of segments
+    const randomizedSegments = [...segments];
+    
+    // Shuffle segments using Fisher-Yates algorithm
+    for (let i = randomizedSegments.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [randomizedSegments[i], randomizedSegments[j]] = [randomizedSegments[j], randomizedSegments[i]];
+    }
+    
+    // Recalculate angles for shuffled segments
+    const segmentAngle = 360 / randomizedSegments.length;
+    randomizedSegments.forEach((segment, index) => {
+        segment.angle = index * segmentAngle;
+        // Assign a random soft color
+        segment.color = window.WheelConfig?.getRandomSoftColor() || '#F8F9FA';
     });
+    
+    return randomizedSegments;
 }
 
 function drawWheel() {
-    if (!wheelContext || !wheelSegments.length) return;
+    if (!wheelContext || !wheelSegments.length) {
+        return;
+    }
+    
+    const config = window.WheelConfig?.WHEEL_CONFIG || {};
     
     const centerX = wheelCanvas.width / 2;
     const centerY = wheelCanvas.height / 2;
-    const radius = Math.min(centerX, centerY) - 20;
+    const radius = Math.min(centerX, centerY) - (config.MIN_RADIUS || 20);
     
     // Clear canvas
     wheelContext.clearRect(0, 0, wheelCanvas.width, wheelCanvas.height);
@@ -156,18 +143,18 @@ function drawWheel() {
         wheelContext.arc(centerX, centerY, radius, startAngle, endAngle);
         wheelContext.closePath();
         
-        // Fill segment
-        wheelContext.fillStyle = segment.color;
+        // Fill segment with soft color
+        wheelContext.fillStyle = segment.color || '#F8F9FA';
         wheelContext.fill();
         
-        // Draw segment border
-        wheelContext.strokeStyle = '#ffffff';
-        wheelContext.lineWidth = 2;
+        // Draw segment border with subtle dark border
+        wheelContext.strokeStyle = 'rgba(0, 0, 0, 0.1)';
+        wheelContext.lineWidth = config.BORDER_WIDTH || 2;
         wheelContext.stroke();
         
         // Draw text
         const textAngle = startAngle + segmentAngle / 2;
-        const textRadius = radius * 0.7;
+        const textRadius = radius * (config.TEXT_RADIUS_RATIO || 0.7);
         const textX = centerX + Math.cos(textAngle) * textRadius;
         const textY = centerY + Math.sin(textAngle) * textRadius;
         
@@ -176,17 +163,17 @@ function drawWheel() {
         // Rotate text to be vertical like a wheel spoke (from center to edge)
         wheelContext.rotate(textAngle);
         
-        // Text styling with medieval font
-        wheelContext.fillStyle = '#ffffff';
+        // Text styling with medieval font and dark color for contrast
+        wheelContext.fillStyle = '#2C3E50'; // Dark blue-gray for better readability on light backgrounds
         wheelContext.font = 'bold 16px "Cinzel", serif';
         wheelContext.textAlign = 'center';
         wheelContext.textBaseline = 'middle';
         
-        // Draw text with shadow
-        wheelContext.shadowColor = 'rgba(0, 0, 0, 0.7)';
-        wheelContext.shadowBlur = 4;
-        wheelContext.shadowOffsetX = 2;
-        wheelContext.shadowOffsetY = 2;
+        // Draw text with subtle shadow for depth
+        wheelContext.shadowColor = 'rgba(255, 255, 255, 0.8)';
+        wheelContext.shadowBlur = 2;
+        wheelContext.shadowOffsetX = 1;
+        wheelContext.shadowOffsetY = 1;
         
         // Handle long text by splitting into multiple lines
         const words = segment.text.split(' ');
@@ -219,18 +206,25 @@ function drawWheel() {
         wheelContext.restore();
     });
     
-    // Draw center circle
+    // Draw center circle with subtle styling
+    const centerRadius = config.CENTER_CIRCLE_RADIUS || 15;
     wheelContext.beginPath();
-    wheelContext.arc(centerX, centerY, 15, 0, 2 * Math.PI);
-    wheelContext.fillStyle = '#ffffff';
+    wheelContext.arc(centerX, centerY, centerRadius, 0, 2 * Math.PI);
+    wheelContext.fillStyle = '#FFFFFF';
     wheelContext.fill();
-    wheelContext.strokeStyle = '#333333';
-    wheelContext.lineWidth = 3;
+    wheelContext.strokeStyle = 'rgba(0, 0, 0, 0.2)';
+    wheelContext.lineWidth = config.CENTER_BORDER_WIDTH || 3;
     wheelContext.stroke();
 }
 
 async function spinWheel() {
     if (isSpinning) return;
+    
+    const spinButton = document.querySelector('#spin-button');
+    const config = window.WheelConfig?.WHEEL_CONFIG || {};
+    
+    // Set button to loading state
+    GameShowUtils.setButtonState(spinButton, true, 'Spinning...', '<i class="fas fa-play"></i> SPIN THE WHEEL!');
     
     // Check if GameShow object is available
     if (typeof GameShow === 'undefined' || !GameShow.apiCall) {
@@ -251,37 +245,13 @@ async function spinWheel() {
                 const data = await response.json();
                 
                 if (data.success) {
-                    // Continue with the spin logic
-                    // Calculate final rotation - simpler approach with multiple full rotations
-                    const baseRotation = data.result.final_angle * (Math.PI / 180);
-                    const fullRotations = 8 * 2 * Math.PI; // 8 full rotations for more dramatic effect
-                    const finalRotation = baseRotation + fullRotations;
-                    
-                    // Animate wheel spin
-                    animateWheelSpin(finalRotation, () => {
-                        // Spin complete
-                        isSpinning = false;
-                        
-                        const spinButton = document.querySelector('#spin-button');
-                        if (spinButton) {
-                            spinButton.disabled = false;
-                            spinButton.innerHTML = '<i class="fas fa-play"></i> SPIN THE WHEEL!';
-                        }
-                        
-                        wheelCanvas.classList.remove('wheel-glow-spinning');
-                    });
+                    handleSpinSuccess(data, spinButton);
                 } else {
                     throw new Error(data.error || 'Failed to spin wheel');
                 }
             } catch (error) {
-                alert('Failed to spin wheel: ' + error.message);
-                
-                isSpinning = false;
-                const spinButton = document.querySelector('#spin-button');
-                if (spinButton) {
-                    spinButton.disabled = false;
-                    spinButton.innerHTML = '<i class="fas fa-play"></i> SPIN THE WHEEL!';
-                }
+                GameShowUtils.handleError(error, 'Spinning wheel');
+                GameShowUtils.setButtonState(spinButton, false);
                 wheelCanvas.classList.remove('wheel-glow-spinning');
             }
             return;
@@ -297,11 +267,6 @@ async function spinWheel() {
     }
     
     isSpinning = true;
-    const spinButton = document.querySelector('#spin-button');
-    if (spinButton) {
-        spinButton.disabled = true;
-        spinButton.innerHTML = '<span class="loading-spinner"></span> Spinning...';
-    }
     
     try {
         // Add spinning animation class
@@ -313,45 +278,37 @@ async function spinWheel() {
         });
         
         if (data.success) {
-            // Calculate final rotation - simpler approach with multiple full rotations
-            const baseRotation = data.result.final_angle * (Math.PI / 180);
-            const fullRotations = 8 * 2 * Math.PI; // 8 full rotations for more dramatic effect
-            const finalRotation = baseRotation + fullRotations;
-            
-            // Animate wheel spin
-            animateWheelSpin(finalRotation, () => {
-                // Spin complete
-                isSpinning = false;
-                
-                if (spinButton) {
-                    spinButton.disabled = false;
-                    spinButton.innerHTML = '<i class="fas fa-play"></i> SPIN THE WHEEL!';
-                }
-                
-                wheelCanvas.classList.remove('wheel-glow-spinning');
-            });
+            handleSpinSuccess(data, spinButton);
         } else {
             throw new Error(data.error || 'Failed to spin wheel');
         }
     } catch (error) {
-        // Check if GameShow.showNotification exists before calling it
-        if (typeof GameShow !== 'undefined' && GameShow.showNotification) {
-            GameShow.showNotification('Failed to spin wheel', 'danger');
-        } else {
-            alert('Failed to spin wheel: ' + error.message);
-        }
-        
-        isSpinning = false;
-        if (spinButton) {
-            spinButton.disabled = false;
-            spinButton.innerHTML = '<i class="fas fa-play"></i> SPIN THE WHEEL!';
-        }
+        GameShowUtils.handleError(error, 'Spinning wheel');
+        GameShowUtils.setButtonState(spinButton, false);
         wheelCanvas.classList.remove('wheel-glow-spinning');
     }
 }
 
+function handleSpinSuccess(data, spinButton) {
+    const config = window.WheelConfig?.WHEEL_CONFIG || {};
+    
+    // Calculate final rotation
+    const baseRotation = data.result.final_angle * (Math.PI / 180);
+    const fullRotations = (config.FULL_ROTATIONS || 8) * 2 * Math.PI;
+    const finalRotation = baseRotation + fullRotations;
+    
+    // Animate wheel spin
+    animateWheelSpin(finalRotation, () => {
+        // Spin complete
+        isSpinning = false;
+        GameShowUtils.setButtonState(spinButton, false);
+        wheelCanvas.classList.remove('wheel-glow-spinning');
+    });
+}
+
 function animateWheelSpin(targetRotation, onComplete) {
-    const duration = 5000; // 5 seconds for more visible spinning
+    const config = window.WheelConfig?.WHEEL_CONFIG || {};
+    const duration = config.SPIN_DURATION || 5000;
     const startRotation = currentRotation;
     const startTime = performance.now();
     
@@ -380,6 +337,26 @@ function animateWheelSpin(targetRotation, onComplete) {
 
 // Make functions globally available for onclick attributes
 window.spinWheel = spinWheel;
+window.refreshWheel = refreshWheel;
+
+// Function to refresh wheel with new random colors and segment order
+function refreshWheel() {
+    if (isSpinning) return;
+    
+    // Randomize segments and colors
+    wheelSegments = randomizeSegments(wheelSegments);
+    
+    // Reset rotation
+    currentRotation = 0;
+    
+    // Redraw wheel
+    drawWheel();
+    
+    // Show notification
+    if (typeof GameShow !== 'undefined' && GameShow.showNotification) {
+        GameShow.showNotification('Wheel refreshed with new random layout!', 'info');
+    }
+}
 
 // Add keyboard shortcuts
 document.addEventListener('keydown', function(event) {
@@ -394,25 +371,19 @@ document.addEventListener('keydown', function(event) {
                 spinWheel();
             }
             break;
+        case 'r':
+        case 'R':
+            event.preventDefault();
+            if (!isSpinning) {
+                refreshWheel();
+            }
+            break;
     }
 });
 
 // Handle window resize
-window.addEventListener('resize', debounce(() => {
+window.addEventListener('resize', GameShowUtils.debounce(() => {
     if (wheelCanvas) {
         drawWheel();
     }
 }, 250));
-
-// Debounce utility function
-function debounce(func, wait) {
-    let timeout;
-    return function executedFunction(...args) {
-        const later = () => {
-            clearTimeout(timeout);
-            func(...args);
-        };
-        clearTimeout(timeout, wait);
-        timeout = setTimeout(later, wait);
-    };
-}

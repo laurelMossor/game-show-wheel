@@ -163,10 +163,10 @@
 
 /* Score Update Animations */
 .score-update {
-    animation: scorePulse 0.6s ease-in-out;
+    animation: scoreUpdatePulse 0.6s ease-in-out;
 }
 
-@keyframes scorePulse {
+@keyframes scoreUpdatePulse {
     0% { transform: scale(1); }
     50% { transform: scale(1.1); }
     100% { transform: scale(1); }
@@ -248,21 +248,31 @@
 
 /* Score Change Indicators */
 .score-change-positive {
-    animation: scoreIncrease 0.8s ease-out;
+    animation: scoreChangePositive 0.8s ease-in-out;
 }
 
 .score-change-negative {
-    animation: scoreDecrease 0.8s ease-out;
+    animation: scoreChangeNegative 0.8s ease-in-out;
 }
 
-@keyframes scoreIncrease {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.1) rotate(5deg); }
-    100% { transform: scale(1); }
+@keyframes scoreChangePositive {
+    0% { 
+        background-color: var(--success-color);
+        transform: scale(1.05);
+    }
+    100% { 
+        background-color: transparent;
+        transform: scale(1);
+    }
 }
 
-@keyframes scoreDecrease {
-    0% { transform: scale(1); }
-    50% { transform: scale(0.9) rotate(-5deg); }
-    100% { transform: scale(1); }
+@keyframes scoreChangeNegative {
+    0% { 
+        background-color: var(--accent-color);
+        transform: scale(1.05);
+    }
+    100% { 
+        background-color: transparent;
+        transform: scale(1);
+    }
 }

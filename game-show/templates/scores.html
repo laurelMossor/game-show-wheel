@@ -31,18 +31,10 @@
                         <span class="score-label">POINTS</span>
                     </div>
                     <div class="score-controls">
-                        <button class="btn btn-success btn-sm score-btn" onclick="updateScore({{ loop.index0 }}, 100)">
-                            <i class="fas fa-plus"></i> 100
-                        </button>
-                        <button class="btn btn-warning btn-sm score-btn" onclick="updateScore({{ loop.index0 }}, 50)">
-                            <i class="fas fa-plus"></i> 50
-                        </button>
-                        <button class="btn btn-info btn-sm score-btn" onclick="updateScore({{ loop.index0 }}, 25)">
-                            <i class="fas fa-plus"></i> 25
-                        </button>
-                        <button class="btn btn-danger btn-sm score-btn" onclick="updateScore({{ loop.index0 }}, -100)">
-                            <i class="fas fa-minus"></i> 100
-                        </button>
+                        <button class="score-btn btn btn-success" onclick="updateScore({{ loop.index0 }}, 100)">+100</button>
+                        <button class="score-btn btn btn-warning" onclick="updateScore({{ loop.index0 }}, -100)">-100</button>
+                        <button class="score-btn btn btn-info" onclick="updateScore({{ loop.index0 }}, 50)">+50</button>
+                        <button class="score-btn btn btn-secondary" onclick="updateScore({{ loop.index0 }}, -50)">-50</button>
                     </div>
                 </div>
                 {% endfor %}
@@ -52,25 +44,25 @@
 
     <!-- Game Controls -->
     <div class="row justify-content-center mt-4">
-        <div class="col-md-6">
+        <div class="col-md-8">
             <div class="game-controls text-center">
-                <button class="btn btn-primary btn-lg me-3" onclick="resetScores()">
-                    <i class="fas fa-redo"></i> Reset All Scores
+                <button class="btn btn-danger btn-lg me-3" onclick="resetScores()">
+                    <i class="fas fa-undo"></i> Reset All Scores
                 </button>
-                <button class="btn btn-success btn-lg" onclick="window.location.href='/wheel'">
-                    <i class="fas fa-circle-notch"></i> Spin the Wheel
-                </button>
+                <a href="/wheel" class="btn btn-primary btn-lg">
+                    <i class="fas fa-circle-notch"></i> Go to Wheel
+                </a>
             </div>
         </div>
     </div>
 
-    <!-- Winner Display -->
+    <!-- Winner Announcement -->
     <div class="row justify-content-center mt-4" id="winner-section" style="display: none;">
-        <div class="col-md-6">
-            <div class="winner-announcement text-center">
+        <div class="col-md-8">
+            <div class="winner-announcement">
                 <h2 class="winner-text">
                     <i class="fas fa-crown"></i> 
-                    <span id="winner-name"></span> Wins!
+                    <span id="winner-name"></span> is in the lead!
                 </h2>
             </div>
         </div>
@@ -82,10 +74,8 @@
             <div class="user-directions-banner">
                 <h3><i class="fas fa-info-circle"></i> How to Use the Scoreboard</h3>
                 <div class="directions-content">
-                    <p><strong>Add Points:</strong> Click <span class="shortcut">+100</span>, <span class="shortcut">+50</span>, or <span class="shortcut">+25</span> buttons</p>
-                    <p><strong>Subtract Points:</strong> Click <span class="shortcut">-100</span> button</p>
-                    <p><strong>Keyboard Shortcuts:</strong> <span class="shortcut">Shift + 1/2/3</span> to add 100 points, <span class="shortcut">Ctrl + 1/2/3</span> to subtract 100 points</p>
-                    <p><strong>Reset:</strong> Click <span class="shortcut">Reset All Scores</span> to start over</p>
+                    <p><strong>Quick Score Updates:</strong> Use <span class="shortcut">Shift + 1/2/3</span> to add 100 points, <span class="shortcut">Ctrl + 1/2/3</span> to subtract 100 points</p>
+                    <p><strong>Reset Scores:</strong> Press <span class="shortcut">R</span> or click the Reset button</p>
                     <p><strong>Navigation:</strong> Use <span class="shortcut">F1</span> for Scores, <span class="shortcut">F2</span> for Wheel</p>
                 </div>
             </div>
@@ -95,6 +85,7 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="{{ url_for('static', filename='js/color-config.js') }}"></script>
+<script src="{{ url_for('static', filename='js/utils.js') }}"></script>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
 <script src="{{ url_for('static', filename='js/scores.js') }}"></script>
 {% endblock %}

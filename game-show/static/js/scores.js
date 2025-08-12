@@ -36,7 +36,7 @@ function initializeScoreBoard() {
 
 function setupScoreControls() {
     // Add event listeners to score buttons
-    document.querySelectorAll('.score-btn').forEach(button => {
+    GameShowUtils.getAllElements('.score-btn').forEach(button => {
         button.addEventListener('click', function(e) {
             e.preventDefault();
             
@@ -52,8 +52,9 @@ function setupScoreControls() {
 
 function setupGameControls() {
     // Reset scores button
-    const resetButton = document.querySelector('button[onclick="resetScores()"]');
+    const resetButton = GameShowUtils.getElement('button[onclick="resetScores()"]');
     if (resetButton) {
+        GameShowUtils.initializeButtonState(resetButton);
         resetButton.addEventListener('click', function(e) {
             e.preventDefault();
             resetScores();
@@ -61,8 +62,9 @@ function setupGameControls() {
     }
     
     // Spin wheel button
-    const wheelButton = document.querySelector('button[onclick*="wheel"]');
+    const wheelButton = GameShowUtils.getElement('button[onclick*="wheel"]');
     if (wheelButton) {
+        GameShowUtils.initializeButtonState(wheelButton);
         wheelButton.addEventListener('click', function(e) {
             e.preventDefault();
             GameShow.navigateToWheel();
@@ -71,6 +73,11 @@ function setupGameControls() {
 }
 
 function addToUpdateQueue(playerId, points) {
+    if (!GameShowUtils.isValidPlayerId(playerId) || !GameShowUtils.isValidPoints(points)) {
+        console.warn('Invalid player ID or points:', { playerId, points });
+        return;
+    }
+    
     scoreUpdateQueue.push({ playerId, points });
     
     if (!isProcessingUpdates) {
@@ -90,19 +97,16 @@ async function processUpdateQueue() {
             await GameShow.updateScore(update.playerId, update.points);
             
             // Add visual feedback
-            const scoreElement = document.getElementById(`score-${update.playerId}`);
+            const scoreElement = GameShowUtils.getElement(`#score-${update.playerId}`);
             if (scoreElement) {
-                scoreElement.classList.add('score-update');
-                setTimeout(() => {
-                    scoreElement.classList.remove('score-update');
-                }, 600);
+                GameShowUtils.animateElement(scoreElement, 'score-update');
             }
             
             // Small delay between updates
             await new Promise(resolve => setTimeout(resolve, 100));
             
         } catch (error) {
-            console.error('Failed to process score update:', error);
+            GameShowUtils.handleError(error, 'Processing score update');
         }
     }
     
@@ -112,7 +116,7 @@ async function processUpdateQueue() {
 function updateScoreDisplay() {
     // Update all score displays
     Object.entries(GameShow.currentScores || {}).forEach(([player, score]) => {
-        const scoreElements = document.querySelectorAll(`[id^="score-"][id$="${player}"]`);
+        const scoreElements = GameShowUtils.getAllElements(`[id^="score-"][id$="${player}"]`);
         scoreElements.forEach(element => {
             element.textContent = GameShow.formatNumber(score);
         });
@@ -127,7 +131,7 @@ function updateScoreDisplay() {
 
 function updateModalScores() {
     Object.entries(GameShow.currentScores || {}).forEach(([player, score]) => {
-        const modalScoreElement = document.getElementById(`modal-score-${player}`);
+        const modalScoreElement = GameShowUtils.getElement(`#modal-score-${player}`);
         if (modalScoreElement) {
             modalScoreElement.textContent = GameShow.formatNumber(score);
         }
@@ -138,8 +142,8 @@ function highlightHighScore() {
     if (!GameShow.currentScores || Object.keys(GameShow.currentScores).length === 0) return;
     
     // Remove previous highlights
-    document.querySelectorAll('.player-score-card').forEach(card => {
-        card.classList.remove('high-score');
+    GameShowUtils.getAllElements('.player-score-card').forEach(card => {
+        GameShowUtils.removeClass(card, 'high-score');
     });
     
     // Find highest score
@@ -150,9 +154,9 @@ function highlightHighScore() {
     
     // Highlight high scorers
     highScorers.forEach(player => {
-        const playerCard = document.querySelector(`[data-player-id="${player}"]`);
+        const playerCard = GameShowUtils.getElement(`[data-player-id="${player}"]`);
         if (playerCard) {
-            playerCard.classList.add('high-score');
+            GameShowUtils.addClass(playerCard, 'high-score');
         }
     });
 }
@@ -180,8 +184,7 @@ async function resetScores() {
         highlightHighScore();
         
     } catch (error) {
-        console.error('Failed to reset scores:', error);
-        GameShow.showNotification('Failed to reset scores', 'danger');
+        GameShowUtils.handleError(error, 'Resetting scores');
     }
 }
 
@@ -232,23 +235,12 @@ document.addEventListener('keydown', function(event) {
 
 // Add visual feedback for score changes
 function addScoreChangeIndicator(playerId, points) {
-    const playerCard = document.querySelector(`[data-player-id="${playerId}"]`);
+    const playerCard = GameShowUtils.getElement(`[data-player-id="${playerId}"]`);
     if (!playerCard) return;
     
     const indicator = document.createElement('div');
     indicator.className = `score-change-indicator ${points > 0 ? 'positive' : 'negative'}`;
     indicator.textContent = `${points > 0 ? '+' : ''}${points}`;
-    indicator.style.cssText = `
-        position: absolute;
-        top: 50%;
-        right: 20px;
-        transform: translateY(-50%);
-        font-size: 1.5rem;
-        font-weight: bold;
-        color: ${points > 0 ? 'var(--success-color)' : 'var(--accent-color)'};
-        z-index: 10;
-        animation: scoreChangeFloat 1s ease-out forwards;
-    `;
     
     playerCard.appendChild(indicator);
     
@@ -258,17 +250,3 @@ function addScoreChangeIndicator(playerId, points) {
         }
     }, 1000);
 }
-
-// Add CSS for score change indicators
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes scoreChangeFloat {
-        0% { opacity: 1; transform: translateY(-50%) translateX(0); }
-        100% { opacity: 0; transform: translateY(-50%) translateX(20px); }
-    }
-    
-    .score-change-indicator {
-        pointer-events: none;
-    }
-`;
-document.head.appendChild(style);

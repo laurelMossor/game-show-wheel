@@ -11,14 +11,7 @@ let isUpdating = false;
 function showNotification(message, type = 'info', duration = 3000) {
     // Create notification element
     const notification = document.createElement('div');
-    notification.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
-    notification.style.cssText = `
-        top: 20px;
-        right: 20px;
-        z-index: 9999;
-        min-width: 300px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    `;
+    notification.className = `alert alert-${type} alert-dismissible fade show position-fixed game-show-notification`;
     
     notification.innerHTML = `
         ${message}
@@ -41,18 +34,6 @@ function showNotification(message, type = 'info', duration = 3000) {
 
 function formatNumber(num) {
     return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-}
-
-function debounce(func, wait) {
-    let timeout;
-    return function executedFunction(...args) {
-        const later = () => {
-            clearTimeout(timeout);
-            func(...args);
-        };
-        clearTimeout(timeout, wait);
-        timeout = setTimeout(later, wait);
-    };
 }
 
 // API utility functions
@@ -107,16 +88,13 @@ async function updateScore(playerId, points) {
             showNotification(`Score updated! ${points > 0 ? '+' : ''}${points} points`, 'success');
             
             // Add animation class
-            const scoreElement = document.getElementById(`score-${playerId}`);
+            const scoreElement = GameShowUtils.getElement(`#score-${playerId}`);
             if (scoreElement) {
-                scoreElement.classList.add(points > 0 ? 'score-change-positive' : 'score-change-negative');
-                setTimeout(() => {
-                    scoreElement.classList.remove('score-change-positive', 'score-change-negative');
-                }, 800);
+                GameShowUtils.animateElement(scoreElement, points > 0 ? 'score-change-positive' : 'score-change-negative', 800);
             }
         }
     } catch (error) {
-        console.error('Failed to update score:', error);
+        GameShowUtils.handleError(error, 'Updating score');
     } finally {
         isUpdating = false;
     }
@@ -125,7 +103,7 @@ async function updateScore(playerId, points) {
 function updateScoreDisplay() {
     // Update all score displays
     Object.entries(currentScores).forEach(([player, score]) => {
-        const scoreElements = document.querySelectorAll(`[id^="score-"][id$="${player}"]`);
+        const scoreElements = GameShowUtils.getAllElements(`[id^="score-"][id$="${player}"]`);
         scoreElements.forEach(element => {
             element.textContent = score;
         });
@@ -143,13 +121,13 @@ function checkWinner() {
         .filter(([player, score]) => score === maxScore)
         .map(([player]) => player);
     
-    const winnerSection = document.getElementById('winner-section');
-    const winnerName = document.getElementById('winner-name');
+    const winnerSection = GameShowUtils.getElement('#winner-section');
+    const winnerName = GameShowUtils.getElement('#winner-name');
     
     if (winners.length === 1 && maxScore > 0) {
         winnerName.textContent = winners[0];
+        GameShowUtils.addClass(winnerSection, 'fade-in');
         winnerSection.style.display = 'block';
-        winnerSection.classList.add('fade-in');
     } else {
         winnerSection.style.display = 'none';
     }
@@ -180,7 +158,7 @@ document.addEventListener('keydown', function(event) {
             break;
         case 'Escape':
             // Close any open modals
-            const modals = document.querySelectorAll('.modal.show');
+            const modals = GameShowUtils.getAllElements('.modal.show');
             modals.forEach(modal => {
                 const modalInstance = bootstrap.Modal.getInstance(modal);
                 if (modalInstance) {
@@ -200,30 +178,27 @@ document.addEventListener('DOMContentLoaded', function() {
     fetchScores();
     
     // Add loading states to buttons
-    document.querySelectorAll('.btn').forEach(button => {
+    GameShowUtils.getAllElements('.btn').forEach(button => {
+        GameShowUtils.initializeButtonState(button);
+        
         button.addEventListener('click', function() {
             if (this.classList.contains('btn-loading')) return;
             
             // Add loading state
-            const originalText = this.innerHTML;
-            this.innerHTML = '<span class="loading-spinner"></span> Loading...';
-            this.classList.add('btn-loading');
-            this.disabled = true;
+            GameShowUtils.setButtonState(this, true, 'Loading...');
             
             // Remove loading state after a delay (or when API call completes)
             setTimeout(() => {
-                this.innerHTML = originalText;
-                this.classList.remove('btn-loading');
-                this.disabled = false;
+                GameShowUtils.setButtonState(this, false);
             }, 2000);
         });
     });
     
     // Add smooth scrolling for anchor links
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    GameShowUtils.getAllElements('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
             e.preventDefault();
-            const target = document.querySelector(this.getAttribute('href'));
+            const target = GameShowUtils.getElement(this.getAttribute('href'));
             if (target) {
                 target.scrollIntoView({
                     behavior: 'smooth',

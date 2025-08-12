@@ -239,6 +239,47 @@ body.game-show-body {
     to { transform: rotate(360deg); }
 }
 
+/* Score change indicators */
+.score-change-indicator {
+    position: absolute;
+    top: 50%;
+    right: 20px;
+    transform: translateY(-50%);
+    font-size: 1.5rem;
+    font-weight: bold;
+    z-index: 10;
+    pointer-events: none;
+    animation: scoreChangeFloat 1s ease-out forwards;
+}
+
+.score-change-indicator.positive {
+    color: var(--success-color);
+}
+
+.score-change-indicator.negative {
+    color: var(--accent-color);
+}
+
+@keyframes scoreChangeFloat {
+    0% { 
+        opacity: 1; 
+        transform: translateY(-50%) translateX(0); 
+    }
+    100% { 
+        opacity: 0; 
+        transform: translateY(-50%) translateX(20px); 
+    }
+}
+
+/* Game show notifications */
+.game-show-notification {
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    min-width: 300px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
 /* Utility Classes */
 .text-gold { color: var(--gold-color); }
 .text-silver { color: var(--silver-color); }
