@@ -85,7 +85,7 @@ async function loadWheelSegments() {
         drawWheel();
     } catch (error) {
         // Use randomized default segments if API fails
-        wheelSegments = window.WheelConfig?.randomizeWheel() || [];
+        wheelSegments = randomizeSegments(window.WheelConfig?.DEFAULT_WHEEL_SEGMENTS || []);
         drawWheel();
     }
 }
@@ -130,6 +130,26 @@ function drawWheel() {
     // Clear canvas
     wheelContext.clearRect(0, 0, wheelCanvas.width, wheelCanvas.height);
     
+    // Draw the outer wooden ring first (water wheel frame)
+    const outerRadius = radius + (config.WOODEN_RING_WIDTH || 25);
+    wheelContext.beginPath();
+    wheelContext.arc(centerX, centerY, outerRadius, 0, 2 * Math.PI);
+    wheelContext.fillStyle = config.WOODEN_RING_COLOR || '#8B4513';
+    wheelContext.fill();
+    
+    // Add wood grain texture to the outer ring
+    addWoodGrainTexture(centerX, centerY, outerRadius, config.WOODEN_RING_WIDTH || 25);
+    
+    // Draw the inner wooden ring (inner frame)
+    const innerRadius = radius - (config.WOODEN_RING_WIDTH || 25);
+    wheelContext.beginPath();
+    wheelContext.arc(centerX, centerY, innerRadius, 0, 2 * Math.PI);
+    wheelContext.fillStyle = config.WOODEN_RING_COLOR || '#8B4513';
+    wheelContext.fill();
+    
+    // Add wood grain texture to the inner ring
+    addWoodGrainTexture(centerX, centerY, innerRadius, config.WOODEN_RING_WIDTH || 25);
+    
     // Draw segments
     const segmentAngle = (2 * Math.PI) / wheelSegments.length;
     
@@ -147,12 +167,28 @@ function drawWheel() {
         wheelContext.fillStyle = segment.color || '#F8F9FA';
         wheelContext.fill();
         
-        // Draw segment border with subtle dark border
-        wheelContext.strokeStyle = 'rgba(0, 0, 0, 0.1)';
-        wheelContext.lineWidth = config.BORDER_WIDTH || 2;
+        // Draw wooden slat between segments (thick wooden divider)
+        const slatAngle = startAngle + segmentAngle;
+        const slatStartX = centerX + Math.cos(slatAngle) * (innerRadius + 5);
+        const slatStartY = centerY + Math.sin(slatAngle) * (innerRadius + 5);
+        const slatEndX = centerX + Math.cos(slatAngle) * (outerRadius - 5);
+        const slatEndY = centerY + Math.sin(slatAngle) * (outerRadius - 5);
+        
+        wheelContext.beginPath();
+        wheelContext.moveTo(slatStartX, slatStartY);
+        wheelContext.lineTo(slatEndX, slatEndY);
+        wheelContext.strokeStyle = config.WOODEN_SLAT_COLOR || '#A0522D';
+        wheelContext.lineWidth = config.WOODEN_SLAT_WIDTH || 8;
+        wheelContext.lineCap = 'round';
         wheelContext.stroke();
         
-        // Draw text
+        // Add wood grain to the slat
+        addWoodGrainToSlat(slatStartX, slatStartY, slatEndX, slatEndY, config.WOODEN_SLAT_WIDTH || 8);
+    });
+    
+    // Draw text on segments
+    wheelSegments.forEach((segment, index) => {
+        const startAngle = index * segmentAngle + currentRotation;
         const textAngle = startAngle + segmentAngle / 2;
         const textRadius = radius * (config.TEXT_RADIUS_RATIO || 0.7);
         const textX = centerX + Math.cos(textAngle) * textRadius;
@@ -163,9 +199,9 @@ function drawWheel() {
         // Rotate text to be vertical like a wheel spoke (from center to edge)
         wheelContext.rotate(textAngle);
         
-        // Text styling with medieval font and dark color for contrast
-        wheelContext.fillStyle = '#2C3E50'; // Dark blue-gray for better readability on light backgrounds
-        wheelContext.font = 'bold 16px "Cinzel", serif';
+        // Enhanced text styling with bigger, bolder text
+        wheelContext.fillStyle = '#2C3E50'; // Dark blue-gray for better readability
+        wheelContext.font = `${config.TEXT_WEIGHT || 'bold'} ${config.TEXT_SIZE || 20}px "Cinzel", serif`;
         wheelContext.textAlign = 'center';
         wheelContext.textBaseline = 'middle';
         
@@ -177,7 +213,7 @@ function drawWheel() {
         
         // Handle long text by splitting into multiple lines
         const words = segment.text.split(' ');
-        const lineHeight = 20;
+        const lineHeight = config.TEXT_SIZE + 4 || 24;
         
         if (words.length > 2) {
             // Split into multiple lines
@@ -206,15 +242,66 @@ function drawWheel() {
         wheelContext.restore();
     });
     
-    // Draw center circle with subtle styling
+    // Draw center circle with wooden styling
     const centerRadius = config.CENTER_CIRCLE_RADIUS || 15;
     wheelContext.beginPath();
     wheelContext.arc(centerX, centerY, centerRadius, 0, 2 * Math.PI);
-    wheelContext.fillStyle = '#FFFFFF';
+    wheelContext.fillStyle = config.WOODEN_RING_COLOR || '#8B4513';
     wheelContext.fill();
-    wheelContext.strokeStyle = 'rgba(0, 0, 0, 0.2)';
+    wheelContext.strokeStyle = 'rgba(0, 0, 0, 0.3)';
     wheelContext.lineWidth = config.CENTER_BORDER_WIDTH || 3;
     wheelContext.stroke();
+    
+    // Add wood grain to center circle
+    addWoodGrainTexture(centerX, centerY, centerRadius, centerRadius);
+}
+
+// Function to add wood grain texture to circular elements
+function addWoodGrainTexture(centerX, centerY, radius, width) {
+    const config = window.WheelConfig?.WHEEL_CONFIG || {};
+    const woodColor = config.WOODEN_RING_COLOR || '#8B4513';
+    
+    // Create subtle wood grain effect with darker lines
+    for (let i = 0; i < 8; i++) {
+        const angle = (i * Math.PI) / 4;
+        const startX = centerX + Math.cos(angle) * (radius - width / 2);
+        const startY = centerY + Math.sin(angle) * (radius - width / 2);
+        const endX = centerX + Math.cos(angle) * (radius + width / 2);
+        const endY = centerY + Math.sin(angle) * (radius + width / 2);
+        
+        wheelContext.beginPath();
+        wheelContext.moveTo(startX, startY);
+        wheelContext.lineTo(endX, endY);
+        wheelContext.strokeStyle = 'rgba(0, 0, 0, 0.2)';
+        wheelContext.lineWidth = 1;
+        wheelContext.stroke();
+    }
+}
+
+// Function to add wood grain to slats
+function addWoodGrainToSlat(startX, startY, endX, endY, width) {
+    // Create wood grain lines along the slat
+    const length = Math.sqrt(Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2));
+    const segments = Math.floor(length / 10);
+    
+    for (let i = 0; i < segments; i++) {
+        const progress = i / segments;
+        const x = startX + (endX - startX) * progress;
+        const y = startY + (endY - startY) * progress;
+        
+        // Perpendicular line for wood grain
+        const perpX = x + Math.cos(Math.atan2(endY - startY, endX - startX) + Math.PI / 2) * (width / 2);
+        const perpY = y + Math.sin(Math.atan2(endY - startY, endX - startX) + Math.PI / 2) * (width / 2);
+        const perpEndX = x + Math.cos(Math.atan2(endY - startY, endX - startX) + Math.PI / 2) * (-width / 2);
+        const perpEndY = y + Math.sin(Math.atan2(endY - startY, endX - startX) + Math.PI / 2) * (-width / 2);
+        
+        wheelContext.beginPath();
+        wheelContext.moveTo(perpX, perpY);
+        wheelContext.lineTo(perpEndX, perpEndY);
+        wheelContext.strokeStyle = 'rgba(0, 0, 0, 0.15)';
+        wheelContext.lineWidth = 0.5;
+        wheelContext.stroke();
+    }
 }
 
 async function spinWheel() {
@@ -292,10 +379,23 @@ async function spinWheel() {
 function handleSpinSuccess(data, spinButton) {
     const config = window.WheelConfig?.WHEEL_CONFIG || {};
     
-    // Calculate final rotation
-    const baseRotation = data.result.final_angle * (Math.PI / 180);
-    const fullRotations = (config.FULL_ROTATIONS || 8) * 2 * Math.PI;
-    const finalRotation = baseRotation + fullRotations;
+    // Simple, predictable spin force
+    const baseRotations = 5; // Always spin about 5 full rotations
+    const extraRotations = Math.random() * 2; // Add 0-2 extra rotations for variety
+    
+    // Calculate the target segment angle
+    const targetAngle = data.result.final_angle * (Math.PI / 180);
+    
+    // Calculate how many full rotations we want
+    const totalRotations = (baseRotations + extraRotations) * 2 * Math.PI;
+    
+    // Add a small offset to ensure pointer lands clearly in the target segment
+    const segmentAngle = (2 * Math.PI) / wheelSegments.length;
+    const offset = (Math.random() * 0.5 + 0.25) * segmentAngle; // 0.25 to 0.75 of segment
+    
+    // Calculate the final target rotation
+    // Always move forward from current position by adding rotations
+    const finalRotation = currentRotation + totalRotations + targetAngle + offset;
     
     // Animate wheel spin
     animateWheelSpin(finalRotation, () => {
@@ -308,7 +408,8 @@ function handleSpinSuccess(data, spinButton) {
 
 function animateWheelSpin(targetRotation, onComplete) {
     const config = window.WheelConfig?.WHEEL_CONFIG || {};
-    const duration = config.SPIN_DURATION || 5000;
+    const duration = config.SPIN_DURATION || 3000;
+    
     const startRotation = currentRotation;
     const startTime = performance.now();
     
@@ -316,13 +417,14 @@ function animateWheelSpin(targetRotation, onComplete) {
         const elapsed = currentTime - startTime;
         const progress = Math.min(elapsed / duration, 1);
         
-        // Easing function for smooth deceleration
-        const easeOut = 1 - Math.pow(1 - progress, 3);
+        // Simple, natural wheel physics: starts fast, slows down naturally
+        // Use a simple ease-out function that feels realistic
+        const easeValue = 1 - Math.pow(1 - progress, 2); // Quadratic ease-out
         
-        // Calculate rotation with more dramatic movement
-        currentRotation = startRotation + (targetRotation - startRotation) * easeOut;
+        // Calculate rotation
+        currentRotation = startRotation + (targetRotation - startRotation) * easeValue;
         
-        // Redraw the wheel with new rotation
+        // Redraw the wheel
         drawWheel();
         
         if (progress < 1) {
@@ -337,26 +439,6 @@ function animateWheelSpin(targetRotation, onComplete) {
 
 // Make functions globally available for onclick attributes
 window.spinWheel = spinWheel;
-window.refreshWheel = refreshWheel;
-
-// Function to refresh wheel with new random colors and segment order
-function refreshWheel() {
-    if (isSpinning) return;
-    
-    // Randomize segments and colors
-    wheelSegments = randomizeSegments(wheelSegments);
-    
-    // Reset rotation
-    currentRotation = 0;
-    
-    // Redraw wheel
-    drawWheel();
-    
-    // Show notification
-    if (typeof GameShow !== 'undefined' && GameShow.showNotification) {
-        GameShow.showNotification('Wheel refreshed with new random layout!', 'info');
-    }
-}
 
 // Add keyboard shortcuts
 document.addEventListener('keydown', function(event) {
@@ -369,13 +451,6 @@ document.addEventListener('keydown', function(event) {
             event.preventDefault();
             if (!isSpinning) {
                 spinWheel();
-            }
-            break;
-        case 'r':
-        case 'R':
-            event.preventDefault();
-            if (!isSpinning) {
-                refreshWheel();
             }
             break;
     }

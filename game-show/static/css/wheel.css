@@ -31,14 +31,15 @@
 
 .wheel-pointer {
     position: absolute;
-    top: -30px;
-    left: 50%;
-    transform: translateX(-50%);
+    top: 50%;
+    right: -15px;
+    transform: translateY(-50%);
     z-index: 10;
-    text-align: center;
 }
 
 .wheel-pointer i {
+    color: #228B22; /* Deep green */
+    font-size: 2.5rem;
     filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5));
     animation: seedlingGlow 2s ease-in-out infinite alternate;
 }
