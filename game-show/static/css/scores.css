@@ -1,4 +1,4 @@
-/* Score Board Specific Styles */
+/* Score Board Specific Styles - Medieval Fantasy Theme */
 
 .score-container {
     padding: 20px;
@@ -12,13 +12,13 @@
 }
 
 .player-score-card {
-    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    background: linear-gradient(135deg, var(--cream-color) 0%, var(--light-color) 100%);
     border-radius: 20px;
     padding: 2rem;
     text-align: center;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
     transition: all 0.3s ease;
-    border: 3px solid transparent;
+    border: 3px solid var(--tan-color);
     position: relative;
     overflow: hidden;
 }
@@ -35,7 +35,7 @@
 
 .player-score-card:hover {
     transform: translateY(-10px);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
     border-color: var(--gold-color);
 }
 
@@ -57,12 +57,13 @@
 }
 
 .player-name {
-    color: var(--primary-color);
+    color: var(--deep-brown);
     font-size: 1.5rem;
     font-weight: bold;
     margin-bottom: 0.5rem;
     text-transform: uppercase;
     letter-spacing: 1px;
+    font-family: 'MedievalSharp', cursive;
 }
 
 .player-number {
@@ -75,24 +76,26 @@
     line-height: 40px;
     font-weight: bold;
     font-size: 1.2rem;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    font-family: 'Cinzel', serif;
 }
 
 .score-display {
     margin-bottom: 2rem;
     padding: 1.5rem;
-    background: linear-gradient(135deg, var(--light-color) 0%, #ffffff 100%);
+    background: linear-gradient(135deg, var(--light-color) 0%, var(--cream-color) 100%);
     border-radius: 15px;
-    border: 2px solid var(--light-color);
+    border: 2px solid var(--tan-color);
 }
 
 .score-value {
     display: block;
     font-size: 3rem;
     font-weight: bold;
-    color: var(--primary-color);
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+    color: var(--deep-brown);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
     margin-bottom: 0.5rem;
+    font-family: 'Cinzel', serif;
 }
 
 .score-label {
@@ -102,6 +105,7 @@
     text-transform: uppercase;
     letter-spacing: 2px;
     font-weight: 600;
+    font-family: 'Crimson Text', serif;
 }
 
 .score-controls {
@@ -118,6 +122,7 @@
     transition: all 0.3s ease;
     text-transform: uppercase;
     letter-spacing: 1px;
+    font-family: 'Cinzel', serif;
 }
 
 .score-btn:hover {
@@ -126,11 +131,12 @@
 }
 
 .game-controls {
-    background: rgba(255, 255, 255, 0.1);
+    background: linear-gradient(135deg, var(--cream-color) 0%, var(--light-color) 100%);
     padding: 2rem;
     border-radius: 20px;
     backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 3px solid var(--deep-brown);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
 }
 
 .game-controls .btn {
@@ -139,17 +145,20 @@
 }
 
 .winner-announcement {
-    background: linear-gradient(135deg, var(--gold-color) 0%, #f39c12 100%);
+    background: linear-gradient(135deg, var(--gold-color) 0%, var(--warning-color) 100%);
     padding: 2rem;
     border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
     animation: bounce 1s ease-in-out;
+    border: 3px solid var(--deep-brown);
 }
 
 .winner-text {
     color: white;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
     margin: 0;
+    font-family: 'MedievalSharp', cursive;
+    font-size: 1.5rem;
 }
 
 /* Score Update Animations */
@@ -224,13 +233,13 @@
     border: 2px solid var(--secondary-color);
     border-top-color: transparent;
     border-radius: 50%;
-    animation: spin 1s linear infinite;
+    animation: spin 1s ease-in-out infinite;
 }
 
 /* High Score Highlighting */
 .high-score {
     border-color: var(--gold-color) !important;
-    box-shadow: 0 0 20px rgba(241, 196, 15, 0.3);
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
 }
 
 .high-score .score-value {

@@ -1,16 +1,17 @@
-/* Wheel Interface Specific Styles */
+/* Wheel Interface Specific Styles - Medieval Fantasy Theme */
 
 .wheel-container {
     padding: 20px;
 }
 
 .wheel-section {
-    background: rgba(255, 255, 255, 0.1);
+    background: linear-gradient(135deg, var(--cream-color) 0%, var(--light-color) 100%);
     padding: 2rem;
     border-radius: 20px;
     backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 3px solid var(--deep-brown);
     margin-bottom: 2rem;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
 }
 
 .wheel-wrapper {
@@ -21,8 +22,9 @@
 
 #wheel-canvas {
     border-radius: 50%;
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
     transition: transform 3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    border: 5px solid var(--deep-brown);
 }
 
 .wheel-pointer {
@@ -35,7 +37,7 @@
     border-left: 20px solid transparent;
     border-right: 20px solid transparent;
     border-top: 40px solid var(--accent-color);
-    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5));
     z-index: 10;
 }
 
@@ -48,6 +50,7 @@
     min-width: 150px;
     font-size: 1.1rem;
     padding: 1rem 2rem;
+    font-family: 'Cinzel', serif;
 }
 
 /* Result Display */
@@ -56,20 +59,21 @@
 }
 
 .result-card {
-    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    background: linear-gradient(135deg, var(--cream-color) 0%, var(--light-color) 100%);
     border-radius: 20px;
     padding: 2rem;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
     border: 3px solid var(--gold-color);
     animation: slideUp 0.6s ease-out;
 }
 
 .result-title {
-    color: var(--primary-color);
+    color: var(--deep-brown);
     margin-bottom: 1.5rem;
     font-weight: bold;
     text-transform: uppercase;
     letter-spacing: 1px;
+    font-family: 'MedievalSharp', cursive;
 }
 
 .result-content {
@@ -83,6 +87,7 @@
     margin-bottom: 1rem;
     text-transform: uppercase;
     letter-spacing: 1px;
+    font-family: 'Cinzel', serif;
 }
 
 .result-action {
@@ -90,23 +95,23 @@
     color: var(--secondary-color);
     font-weight: bold;
     margin-bottom: 1rem;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
     text-transform: uppercase;
     letter-spacing: 1px;
+    font-family: 'Cinzel', serif;
 }
 
 .result-text {
     font-size: 1.2rem;
-    color: var(--primary-color);
+    color: var(--deep-brown);
     font-style: italic;
+    font-family: 'Crimson Text', serif;
 }
 
 .result-actions .btn {
     margin: 0 0.5rem;
     min-width: 120px;
 }
-
-
 
 /* Player Selection Modal */
 .player-selection {
@@ -116,28 +121,29 @@
 }
 
 .player-option {
-    background: linear-gradient(135deg, var(--light-color) 0%, #ffffff 100%);
+    background: linear-gradient(135deg, var(--light-color) 0%, var(--cream-color) 100%);
     padding: 1.5rem;
     border-radius: 15px;
     text-align: center;
     cursor: pointer;
     transition: all 0.3s ease;
     border: 2px solid transparent;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 .player-option:hover {
     transform: translateY(-5px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
     border-color: var(--secondary-color);
 }
 
 .player-option h6 {
-    color: var(--primary-color);
+    color: var(--deep-brown);
     font-weight: bold;
     margin-bottom: 1rem;
     text-transform: uppercase;
     letter-spacing: 1px;
+    font-family: 'MedievalSharp', cursive;
 }
 
 .current-score {
@@ -145,6 +151,7 @@
     font-size: 1.5rem;
     font-weight: bold;
     color: var(--success-color);
+    font-family: 'Cinzel', serif;
 }
 
 /* Wheel Spinning Animation */
@@ -157,15 +164,15 @@
     100% { transform: rotate(1440deg); } /* 4 full rotations */
 }
 
-/* Wheel Segment Colors */
-.wheel-segment-0 { background-color: #FF6B6B; }
-.wheel-segment-1 { background-color: #4ECDC4; }
-.wheel-segment-2 { background-color: #45B7D1; }
-.wheel-segment-3 { background-color: #96CEB4; }
-.wheel-segment-4 { background-color: #FFEAA7; }
-.wheel-segment-5 { background-color: #DDA0DD; }
-.wheel-segment-6 { background-color: #98D8C8; }
-.wheel-segment-7 { background-color: #F7DC6F; }
+/* Wheel Segment Colors - Medieval Theme */
+.wheel-segment-0 { background-color: var(--accent-color); }      /* Crimson */
+.wheel-segment-1 { background-color: var(--forest-green); }      /* Forest Green */
+.wheel-segment-2 { background-color: var(--sage-green); }        /* Sage Green */
+.wheel-segment-3 { background-color: var(--muted-green); }       /* Muted Green */
+.wheel-segment-4 { background-color: var(--warm-yellow); }       /* Warm Yellow */
+.wheel-segment-5 { background-color: var(--tan-color); }         /* Tan */
+.wheel-segment-6 { background-color: var(--deep-brown); }        /* Deep Brown */
+.wheel-segment-7 { background-color: var(--warning-color); }     /* Goldenrod */
 
 /* Loading States */
 .wheel-loading {
@@ -204,8 +211,6 @@
         margin: 0.5rem 0;
     }
     
-
-    
     .player-selection {
         grid-template-columns: 1fr;
     }
@@ -232,17 +237,17 @@
 
 /* Wheel Glow Effects */
 .wheel-glow {
-    filter: drop-shadow(0 0 20px rgba(52, 152, 219, 0.5));
+    filter: drop-shadow(0 0 20px rgba(85, 107, 47, 0.5));
 }
 
 .wheel-glow-spinning {
-    filter: drop-shadow(0 0 30px rgba(231, 76, 60, 0.7));
+    filter: drop-shadow(0 0 30px rgba(220, 20, 60, 0.7));
     animation: wheelGlow 3s ease-in-out;
 }
 
 @keyframes wheelGlow {
-    0%, 100% { filter: drop-shadow(0 0 20px rgba(52, 152, 219, 0.5)); }
-    50% { filter: drop-shadow(0 0 40px rgba(231, 76, 60, 0.8)); }
+    0%, 100% { filter: drop-shadow(0 0 20px rgba(85, 107, 47, 0.5)); }
+    50% { filter: drop-shadow(0 0 40px rgba(220, 20, 60, 0.8)); }
 }
 
 /* Segment Highlighting */

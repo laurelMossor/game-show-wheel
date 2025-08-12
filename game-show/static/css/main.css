@@ -1,32 +1,93 @@
-/* Main Game Show Styles */
+/* Main Game Show Styles - Medieval Fantasy Theme */
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Crimson+Text:wght@400;600;700&family=MedievalSharp&display=swap');
+
 :root {
-    --primary-color: #2c3e50;
-    --secondary-color: #3498db;
-    --accent-color: #e74c3c;
-    --success-color: #27ae60;
-    --warning-color: #f39c12;
-    --info-color: #17a2b8;
-    --light-color: #ecf0f1;
-    --dark-color: #2c3e50;
-    --gold-color: #f1c40f;
-    --silver-color: #bdc3c7;
-    --bronze-color: #e67e22;
+    /* Medieval Fantasy Color Palette */
+    --primary-color: #8B4513;      /* Saddle Brown */
+    --secondary-color: #556B2F;    /* Dark Olive Green */
+    --accent-color: #DC143C;       /* Crimson */
+    --success-color: #6B8E23;      /* Olive Drab */
+    --warning-color: #DAA520;      /* Goldenrod */
+    --info-color: #4682B4;         /* Steel Blue */
+    --light-color: #F5F5DC;        /* Beige */
+    --dark-color: #2F4F4F;         /* Dark Slate Gray */
+    --gold-color: #FFD700;         /* Gold */
+    --silver-color: #C0C0C0;       /* Silver */
+    --bronze-color: #CD7F32;       /* Bronze */
+    
+    /* Additional Medieval Colors */
+    --tan-color: #D2B48C;          /* Tan */
+    --cream-color: #FFF8DC;        /* Cornsilk */
+    --forest-green: #228B22;       /* Forest Green */
+    --sage-green: #9CAF88;         /* Sage */
+    --deep-brown: #654321;         /* Dark Brown */
+    --warm-yellow: #F0E68C;        /* Khaki */
+    --muted-green: #8FBC8F;        /* Dark Sea Green */
 }
 
 body.game-show-body {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #8B4513 0%, #556B2F 50%, #2F4F4F 100%);
     min-height: 100vh;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Crimson Text', serif;
     color: var(--dark-color);
 }
 
 /* Game Show Title Styling */
 .game-show-title {
     color: var(--gold-color);
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.7);
     font-weight: bold;
     font-size: 2.5rem;
     margin-bottom: 2rem;
+    font-family: 'MedievalSharp', cursive;
+    letter-spacing: 2px;
+}
+
+/* User Directions Banner */
+.user-directions-banner {
+    background: linear-gradient(135deg, var(--cream-color) 0%, var(--tan-color) 100%);
+    border: 3px solid var(--deep-brown);
+    border-radius: 15px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    position: relative;
+}
+
+.user-directions-banner::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: 20px;
+    width: 20px;
+    height: 20px;
+    background: var(--deep-brown);
+    transform: rotate(45deg);
+    z-index: -1;
+}
+
+.user-directions-banner h3 {
+    color: var(--deep-brown);
+    font-family: 'MedievalSharp', cursive;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    text-align: center;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.user-directions-banner .directions-content {
+    font-family: 'Crimson Text', serif;
+    color: var(--dark-color);
+    line-height: 1.6;
+}
+
+.user-directions-banner .shortcut {
+    background: var(--warm-yellow);
+    padding: 0.2rem 0.5rem;
+    border-radius: 5px;
+    font-weight: bold;
+    color: var(--deep-brown);
+    border: 1px solid var(--deep-brown);
 }
 
 /* Navigation Styling */
@@ -34,11 +95,13 @@ body.game-show-body {
     font-size: 1.5rem;
     font-weight: bold;
     color: var(--gold-color) !important;
+    font-family: 'MedievalSharp', cursive;
 }
 
 .navbar-nav .nav-link {
     font-weight: 500;
     transition: all 0.3s ease;
+    font-family: 'Crimson Text', serif;
 }
 
 .navbar-nav .nav-link:hover {
@@ -59,6 +122,7 @@ body.game-show-body {
     letter-spacing: 1px;
     transition: all 0.3s ease;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    font-family: 'Cinzel', serif;
 }
 
 .btn:hover {
@@ -72,22 +136,22 @@ body.game-show-body {
 }
 
 .btn-success {
-    background: linear-gradient(45deg, var(--success-color), #2ecc71);
+    background: linear-gradient(45deg, var(--success-color), var(--forest-green));
     border: none;
 }
 
 .btn-warning {
-    background: linear-gradient(45deg, var(--warning-color), #f1c40f);
+    background: linear-gradient(45deg, var(--warning-color), var(--gold-color));
     border: none;
 }
 
 .btn-danger {
-    background: linear-gradient(45deg, var(--accent-color), #c0392b);
+    background: linear-gradient(45deg, var(--accent-color), #B22222);
     border: none;
 }
 
 .btn-info {
-    background: linear-gradient(45deg, var(--info-color), #3498db);
+    background: linear-gradient(45deg, var(--info-color), var(--sage-green));
     border: none;
 }
 
@@ -97,6 +161,8 @@ body.game-show-body {
     border: none;
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
     transition: all 0.3s ease;
+    background: linear-gradient(135deg, var(--cream-color) 0%, var(--light-color) 100%);
+    border: 2px solid var(--tan-color);
 }
 
 .card:hover {
@@ -106,9 +172,10 @@ body.game-show-body {
 
 /* Footer Styling */
 .footer {
-    background: linear-gradient(45deg, var(--dark-color), var(--primary-color)) !important;
+    background: linear-gradient(45deg, var(--deep-brown), var(--dark-color)) !important;
     color: var(--light-color);
     margin-top: auto;
+    font-family: 'Crimson Text', serif;
 }
 
 /* Responsive Design */
@@ -120,6 +187,11 @@ body.game-show-body {
     .btn {
         font-size: 0.9rem;
         padding: 0.5rem 1rem;
+    }
+    
+    .user-directions-banner {
+        padding: 1rem;
+        margin-bottom: 1.5rem;
     }
 }
 
@@ -157,9 +229,9 @@ body.game-show-body {
     display: inline-block;
     width: 20px;
     height: 20px;
-    border: 3px solid rgba(255, 255, 255, 0.3);
+    border: 3px solid rgba(139, 69, 19, 0.3);
     border-radius: 50%;
-    border-top-color: #fff;
+    border-top-color: var(--primary-color);
     animation: spin 1s ease-in-out infinite;
 }
 
@@ -177,13 +249,13 @@ body.game-show-body {
 }
 
 .bg-gradient-success {
-    background: linear-gradient(135deg, var(--success-color), #2ecc71);
+    background: linear-gradient(135deg, var(--success-color), var(--forest-green));
 }
 
 .bg-gradient-warning {
-    background: linear-gradient(135deg, var(--warning-color), #f1c40f);
+    background: linear-gradient(135deg, var(--warning-color), var(--gold-color));
 }
 
 .bg-gradient-danger {
-    background: linear-gradient(135deg, var(--accent-color), #c0392b);
+    background: linear-gradient(135deg, var(--accent-color), #B22222);
 }

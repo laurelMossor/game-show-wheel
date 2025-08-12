@@ -83,17 +83,17 @@ async function loadWheelSegments() {
     } catch (error) {
         // Use default segments if API fails
         wheelSegments = [
-            { id: 0, text: "New Rule", action: "new_rule", color: "#FF6B6B", angle: 0 },
-            { id: 1, text: "New Rule", action: "new_rule", color: "#4ECDC4", angle: 30 },
-            { id: 2, text: "New Rule", action: "new_rule", color: "#45B7D1", angle: 60 },
-            { id: 3, text: "Modify: Audience Choice", action: "audience_choice", color: "#96CEB4", angle: 90 },
-            { id: 4, text: "Modify: Audience Choice", action: "audience_choice", color: "#FFEAA7", angle: 120 },
-            { id: 5, text: "Challenge", action: "challenge", color: "#DDA0DD", angle: 150 },
-            { id: 6, text: "Challenge", action: "challenge", color: "#98D8C8", angle: 180 },
-            { id: 7, text: "Challenge", action: "challenge", color: "#F7DC6F", angle: 210 },
-            { id: 8, text: "Modify: Duplicate", action: "duplicate", color: "#FF9F43", angle: 240 },
-            { id: 9, text: "Modify: Reverse", action: "reverse", color: "#A29BFE", angle: 270 },
-            { id: 10, text: "Modify: Swap", action: "swap", color: "#FD79A8", angle: 300 }
+            { id: 0, text: "New Rule", action: "new_rule", color: "#DC143C", angle: 0 },           // Crimson
+            { id: 1, text: "New Rule", action: "new_rule", color: "#228B22", angle: 30 },         // Forest Green
+            { id: 2, text: "New Rule", action: "new_rule", color: "#9CAF88", angle: 60 },         // Sage Green
+            { id: 3, text: "Modify: Audience Choice", action: "audience_choice", color: "#8FBC8F", angle: 90 }, // Muted Green
+            { id: 4, text: "Modify: Audience Choice", action: "audience_choice", color: "#F0E68C", angle: 120 }, // Warm Yellow
+            { id: 5, text: "Challenge", action: "challenge", color: "#D2B48C", angle: 150 },       // Tan
+            { id: 6, text: "Challenge", action: "challenge", color: "#654321", angle: 180 },       // Deep Brown
+            { id: 7, text: "Challenge", action: "challenge", color: "#DAA520", angle: 210 },       // Goldenrod
+            { id: 8, text: "Modify: Duplicate", action: "duplicate", color: "#8B4513", angle: 240 }, // Saddle Brown
+            { id: 9, text: "Modify: Reverse", action: "reverse", color: "#556B2F", angle: 270 },   // Dark Olive Green
+            { id: 10, text: "Modify: Swap", action: "swap", color: "#4682B4", angle: 300 }        // Steel Blue
         ];
         drawWheel();
     }
@@ -139,23 +139,24 @@ function drawWheel() {
         
         wheelContext.save();
         wheelContext.translate(textX, textY);
+        // Rotate text to be vertical (perpendicular to radius)
         wheelContext.rotate(textAngle + Math.PI / 2);
         
-        // Text styling
+        // Text styling with medieval font
         wheelContext.fillStyle = '#ffffff';
-        wheelContext.font = 'bold 14px Arial';
+        wheelContext.font = 'bold 16px "Cinzel", serif';
         wheelContext.textAlign = 'center';
         wheelContext.textBaseline = 'middle';
         
         // Draw text with shadow
-        wheelContext.shadowColor = 'rgba(0, 0, 0, 0.5)';
+        wheelContext.shadowColor = 'rgba(0, 0, 0, 0.7)';
         wheelContext.shadowBlur = 4;
         wheelContext.shadowOffsetX = 2;
         wheelContext.shadowOffsetY = 2;
         
         // Handle long text by splitting into multiple lines
         const words = segment.text.split(' ');
-        const lineHeight = 18;
+        const lineHeight = 20;
         
         if (words.length > 2) {
             // Split into multiple lines
