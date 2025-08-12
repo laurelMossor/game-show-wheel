@@ -1,74 +1,279 @@
 /**
  * Scores Interface JavaScript
  * Handles score board functionality and player score management
+ * Now with persistent state storage using localStorage
  */
 
 // Score board specific variables
 let scoreUpdateQueue = [];
 let isProcessingUpdates = false;
+let isInitialized = false;
+
+// Constants
+const DEFAULT_FAVOR = 100;
+const UPDATE_DELAY = 100;
+const STORAGE_KEYS = {
+    PLAYER_NAMES: 'gameShow_playerNames',
+    PLAYER_SCORES: 'gameShow_playerScores',
+    LAST_SYNC: 'gameShow_lastSync'
+};
 
 // Initialize scores page
 document.addEventListener('DOMContentLoaded', function() {
-    initializeScoreBoard();
-    setupScoreControls();
-    setupGameControls();
+    console.log('DOMContentLoaded event fired');
+    waitForGameShow();
 });
 
-function initializeScoreBoard() {
-    // Fetch initial scores
-    GameShow.fetchScores().then(data => {
-        if (data) {
-            updateScoreDisplay();
-            highlightHighScore();
-        }
+// Handle page visibility changes (when navigating back to the page)
+document.addEventListener('visibilitychange', function() {
+    if (!document.hidden && window.GameShow && window.GameShow.currentScores) {
+        console.log('Page became visible, restoring state from localStorage');
+        restoreStateFromStorage();
+        updateScoreDisplay();
+        
+        // Also sync any input fields that might have been modified
+        syncInputFieldsWithScores();
+    }
+});
+
+function waitForGameShow() {
+    console.log('waitForGameShow called:', {
+        GameShowExists: typeof window.GameShow !== 'undefined',
+        currentScoresExists: window.GameShow?.currentScores !== undefined,
+        GameShowUtilsExists: typeof window.GameShowUtils !== 'undefined',
+        isInitialized: isInitialized
     });
     
-    // Set up auto-refresh
-    setInterval(() => {
-        GameShow.fetchScores().then(data => {
-            if (data) {
-                updateScoreDisplay();
-                highlightHighScore();
-            }
-        });
-    }, 10000); // Refresh every 10 seconds
+    if (typeof window.GameShow !== 'undefined' && 
+        window.GameShow.currentScores !== undefined && 
+        typeof window.GameShowUtils !== 'undefined' &&
+        !isInitialized) {
+        console.log('Initializing scores page...');
+        initializeScoreBoard();
+        setupEditableNames();
+        setupFavorControls();
+        setupRefreshButton();
+        isInitialized = true;
+    } else if (!isInitialized) {
+        setTimeout(waitForGameShow, 100);
+    }
 }
 
-function setupScoreControls() {
-    // Add event listeners to score buttons
-    GameShowUtils.getAllElements('.score-btn').forEach(button => {
-        button.addEventListener('click', function(e) {
-            e.preventDefault();
-            
-            const playerCard = this.closest('.player-score-card');
-            const playerId = parseInt(playerCard.dataset.playerId);
-            const points = parseInt(this.textContent.match(/[+-]?\d+/)[0]);
-            
-            // Add to update queue
-            addToUpdateQueue(playerId, points);
-        });
-    });
-}
-
-function setupGameControls() {
-    // Reset scores button
-    const resetButton = GameShowUtils.getElement('button[onclick="resetScores()"]');
-    if (resetButton) {
-        GameShowUtils.initializeButtonState(resetButton);
-        resetButton.addEventListener('click', function(e) {
-            e.preventDefault();
-            resetScores();
-        });
+function initializeScoreBoard() {
+    console.log('initializeScoreBoard called');
+    
+    if (typeof GameShow === 'undefined' || !GameShow.currentScores) {
+        console.warn('GameShow object not ready, retrying...');
+        setTimeout(initializeScoreBoard, 100);
+        return;
     }
     
-    // Spin wheel button
-    const wheelButton = GameShowUtils.getElement('button[onclick*="wheel"]');
-    if (wheelButton) {
-        GameShowUtils.initializeButtonState(wheelButton);
-        wheelButton.addEventListener('click', function(e) {
-            e.preventDefault();
-            GameShow.navigateToWheel();
+    // First, try to restore state from localStorage
+    restoreStateFromStorage();
+    
+    // Always update the display to reflect current values
+    updateScoreDisplay();
+    
+    // If we don't have any scores yet, fetch from server
+    if (Object.keys(GameShow.currentScores).length === 0) {
+        console.log('No scores found, fetching from server...');
+        fetchAndUpdateScores();
+    } else {
+        console.log('Using current scores:', GameShow.currentScores);
+    }
+}
+
+function restoreStateFromStorage() {
+    try {
+        // Restore player names
+        const savedNames = localStorage.getItem(STORAGE_KEYS.PLAYER_NAMES);
+        if (savedNames) {
+            const playerNames = JSON.parse(savedNames);
+            Object.entries(playerNames).forEach(([playerId, name]) => {
+                const nameInput = document.querySelector(`.player-name-input[data-player-id="${playerId}"]`);
+                if (nameInput) {
+                    nameInput.value = name;
+                    nameInput.dataset.originalValue = name;
+                }
+            });
+            console.log('Restored player names:', playerNames);
+        }
+        
+        // Restore player scores
+        const savedScores = localStorage.getItem(STORAGE_KEYS.PLAYER_SCORES);
+        if (savedScores) {
+            const playerScores = JSON.parse(savedScores);
+            // Update GameShow.currentScores with the restored scores
+            GameShow.currentScores = playerScores;
+            console.log('Restored player scores:', playerScores);
+        } else {
+            // If no saved scores, initialize with defaults
+            GameShow.currentScores = { 'Player 1': DEFAULT_FAVOR, 'Player 2': DEFAULT_FAVOR, 'Player 3': DEFAULT_FAVOR };
+            console.log('No saved scores found, using defaults:', GameShow.currentScores);
+        }
+        
+        // Update last sync timestamp
+        localStorage.setItem(STORAGE_KEYS.LAST_SYNC, Date.now().toString());
+        
+    } catch (error) {
+        console.warn('Error restoring state from localStorage:', error);
+        // Fallback to defaults if restoration fails
+        GameShow.currentScores = { 'Player 1': DEFAULT_FAVOR, 'Player 2': DEFAULT_FAVOR, 'Player 3': DEFAULT_FAVOR };
+        console.log('Using fallback default scores:', GameShow.currentScores);
+    }
+}
+
+function saveStateToStorage() {
+    try {
+        // Save player names
+        const playerNames = {};
+        document.querySelectorAll('.player-name-input').forEach(input => {
+            const playerId = input.dataset.playerId;
+            playerNames[playerId] = input.value;
         });
+        localStorage.setItem(STORAGE_KEYS.PLAYER_NAMES, JSON.stringify(playerNames));
+        
+        // Save player scores
+        if (GameShow.currentScores) {
+            localStorage.setItem(STORAGE_KEYS.PLAYER_SCORES, JSON.stringify(GameShow.currentScores));
+        }
+        
+        // Update last sync timestamp
+        localStorage.setItem(STORAGE_KEYS.LAST_SYNC, Date.now().toString());
+        
+        console.log('State saved to localStorage:', { playerNames, scores: GameShow.currentScores });
+    } catch (error) {
+        console.warn('Error saving state to localStorage:', error);
+    }
+}
+
+function setupRefreshButton() {
+    const refreshBtn = document.getElementById('refresh-scores-btn');
+    if (refreshBtn) {
+        refreshBtn.addEventListener('click', function() {
+            console.log('Manual refresh requested');
+            fetchAndUpdateScores(true); // Force refresh
+        });
+    }
+}
+
+function fetchAndUpdateScores(forceRefresh = false) {
+    // Check if we should fetch from server (avoid too frequent requests)
+    const lastSync = parseInt(localStorage.getItem(STORAGE_KEYS.LAST_SYNC) || '0');
+    const timeSinceLastSync = Date.now() - lastSync;
+    const minSyncInterval = 5000; // 5 seconds minimum between syncs
+    
+    if (!forceRefresh && timeSinceLastSync < minSyncInterval) {
+        console.log('Skipping server sync, too soon since last sync');
+        return;
+    }
+    
+    console.log('Fetching scores from server...');
+    GameShow.fetchScores().then(data => {
+        if (data && data.scores) {
+            const currentScores = GameShow.currentScores || {};
+            const newScores = data.scores;
+            
+            // Update the GameShow scores with the server data
+            GameShow.currentScores = newScores;
+            
+            // Update the display to show the new scores
+            updateScoreDisplay();
+            
+            // Save the new state to localStorage
+            saveStateToStorage();
+            
+            console.log('Scores updated from server:', newScores);
+        }
+    }).catch(error => {
+        console.warn('Failed to fetch scores from server, using local state:', error);
+    });
+}
+
+function setupEditableNames() {
+    setupInputControls('.player-name-input', savePlayerName);
+}
+
+function setupFavorControls() {
+    setupInputControls('.favor-value-input', saveFavorValue, true);
+}
+
+function setupInputControls(selector, saveFunction, isNumeric = false) {
+    GameShowUtils.getAllElements(selector).forEach(input => {
+        input.addEventListener('click', () => input.select());
+        input.addEventListener('keydown', (e) => handleKeyDown(e, input, saveFunction));
+        input.addEventListener('blur', () => saveFunction(input));
+        
+        if (isNumeric) {
+            input.addEventListener('input', () => {
+                input.value = input.value.replace(/[^0-9-]/g, '');
+            });
+        }
+    });
+}
+
+function handleKeyDown(event, input, saveFunction) {
+    if (event.key === 'Enter') {
+        input.blur();
+        saveFunction(input);
+    } else if (event.key === 'Escape') {
+        if (input.classList.contains('favor-value-input')) {
+            const playerId = parseInt(input.dataset.playerId);
+            const playerName = getPlayerNameFromId(playerId);
+            input.value = playerName ? (GameShow.currentScores[playerName] || DEFAULT_FAVOR) : DEFAULT_FAVOR;
+        } else {
+            input.value = input.dataset.originalValue;
+        }
+        input.blur();
+    }
+}
+
+function savePlayerName(input) {
+    const playerId = parseInt(input.closest('.player-score-card').dataset.playerId);
+    const newName = input.value.trim();
+    
+    if (newName === '') {
+        input.value = input.dataset.originalValue;
+        return;
+    }
+    
+    input.dataset.originalValue = newName;
+    console.log(`Player ${playerId + 1} name changed to: ${newName}`);
+    
+    // Save state immediately when name changes
+    saveStateToStorage();
+}
+
+function saveFavorValue(input) {
+    const playerId = parseInt(input.dataset.playerId);
+    const newValue = parseInt(input.value) || DEFAULT_FAVOR;
+    updateFavorValue(playerId, newValue);
+}
+
+function updateFavorValue(playerId, newValue) {
+    if (!GameShowUtils.isValidPlayerId(playerId)) {
+        console.warn('Invalid player ID:', playerId);
+        return;
+    }
+    
+    // Get the player name from the ID
+    const playerName = getPlayerNameFromId(playerId);
+    if (!playerName) {
+        console.warn('Could not find player name for ID:', playerId);
+        return;
+    }
+    
+    const currentValue = GameShow.currentScores[playerName] || DEFAULT_FAVOR;
+    const difference = newValue - currentValue;
+    
+    if (difference !== 0) {
+        // Update the local score immediately
+        GameShow.currentScores[playerName] = newValue;
+        updateScoreDisplay();
+        saveStateToStorage();
+        
+        // Queue the update to the server
+        addToUpdateQueue(playerId, difference);
     }
 }
 
@@ -95,16 +300,7 @@ async function processUpdateQueue() {
         
         try {
             await GameShow.updateScore(update.playerId, update.points);
-            
-            // Add visual feedback
-            const scoreElement = GameShowUtils.getElement(`#score-${update.playerId}`);
-            if (scoreElement) {
-                GameShowUtils.animateElement(scoreElement, 'score-update');
-            }
-            
-            // Small delay between updates
-            await new Promise(resolve => setTimeout(resolve, 100));
-            
+            await new Promise(resolve => setTimeout(resolve, UPDATE_DELAY));
         } catch (error) {
             GameShowUtils.handleError(error, 'Processing score update');
         }
@@ -113,93 +309,100 @@ async function processUpdateQueue() {
     isProcessingUpdates = false;
 }
 
-function updateScoreDisplay() {
-    // Update all score displays
-    Object.entries(GameShow.currentScores || {}).forEach(([player, score]) => {
-        const scoreElements = GameShowUtils.getAllElements(`[id^="score-"][id$="${player}"]`);
-        scoreElements.forEach(element => {
-            element.textContent = GameShow.formatNumber(score);
-        });
+function logCurrentState() {
+    console.log('=== CURRENT STATE DEBUG ===');
+    console.log('GameShow.currentScores:', GameShow.currentScores);
+    console.log('Input field values:');
+    document.querySelectorAll('.favor-value-input').forEach(input => {
+        const playerId = input.dataset.playerId;
+        const value = input.value;
+        console.log(`  Player ${playerId}: ${value}`);
     });
+    console.log('localStorage scores:', localStorage.getItem(STORAGE_KEYS.PLAYER_SCORES));
+    console.log('==========================');
+}
+
+// Add debug logging to key functions
+function updateScoreDisplay() {
+    console.log('updateScoreDisplay called with scores:', GameShow.currentScores);
     
-    // Update modal scores if modal exists
-    updateModalScores();
+    if (GameShow.currentScores) {
+        Object.entries(GameShow.currentScores).forEach(([playerName, score]) => {
+            // Map player names to player IDs for the input fields
+            const playerId = getPlayerIdFromName(playerName);
+            if (playerId !== null) {
+                const favorInputs = GameShowUtils.getAllElements(`.favor-value-input[data-player-id="${playerId}"]`);
+                favorInputs.forEach(element => {
+                    // Always update the input field to match the current score
+                    element.value = GameShow.formatNumber(score);
+                });
+            }
+        });
+    }
     
-    // Check for winner
-    GameShow.checkWinner();
+    // Only update modal scores if we're on a page that has modals
+    if (window.location.pathname !== '/') {
+        updateModalScores();
+    }
+    
+    logCurrentState();
+}
+
+function getPlayerIdFromName(playerName) {
+    // Map player names to numeric IDs
+    const playerMap = {
+        'Player 1': 0,
+        'Player 2': 1,
+        'Player 3': 2
+    };
+    return playerMap[playerName] || null;
+}
+
+function getPlayerNameFromId(playerId) {
+    // Map numeric IDs to player names
+    const playerMap = {
+        0: 'Player 1',
+        1: 'Player 2',
+        2: 'Player 3'
+    };
+    return playerMap[playerId] || null;
 }
 
 function updateModalScores() {
-    Object.entries(GameShow.currentScores || {}).forEach(([player, score]) => {
-        const modalScoreElement = GameShowUtils.getElement(`#modal-score-${player}`);
-        if (modalScoreElement) {
-            modalScoreElement.textContent = GameShow.formatNumber(score);
-        }
-    });
-}
-
-function highlightHighScore() {
-    if (!GameShow.currentScores || Object.keys(GameShow.currentScores).length === 0) return;
-    
-    // Remove previous highlights
-    GameShowUtils.getAllElements('.player-score-card').forEach(card => {
-        GameShowUtils.removeClass(card, 'high-score');
-    });
-    
-    // Find highest score
-    const maxScore = Math.max(...Object.values(GameShow.currentScores));
-    const highScorers = Object.entries(GameShow.currentScores)
-        .filter(([player, score]) => score === maxScore)
-        .map(([player]) => player);
-    
-    // Highlight high scorers
-    highScorers.forEach(player => {
-        const playerCard = GameShowUtils.getElement(`[data-player-id="${player}"]`);
-        if (playerCard) {
-            GameShowUtils.addClass(playerCard, 'high-score');
-        }
-    });
-}
-
-async function resetScores() {
-    if (!confirm('Are you sure you want to reset all scores to zero?')) {
-        return;
-    }
-    
-    try {
-        // Reset each player's score to 0
-        const players = Object.keys(GameShow.currentScores || {});
-        for (const player of players) {
-            const playerId = players.indexOf(player);
-            const currentScore = GameShow.currentScores[player];
-            if (currentScore !== 0) {
-                await GameShow.updateScore(playerId, -currentScore);
+    if (GameShow.currentScores) {
+        Object.entries(GameShow.currentScores).forEach(([player, score]) => {
+            try {
+                const playerId = parseInt(player);
+                if (!isNaN(playerId) && playerId >= 0 && playerId <= 2) {
+                    const modalScoreElement = GameShowUtils.getElement(`#modal-score-${playerId}`);
+                    if (modalScoreElement) {
+                        modalScoreElement.textContent = GameShow.formatNumber(score);
+                    }
+                }
+            } catch (error) {
+                console.warn(`Error updating modal score for player ${player}:`, error);
             }
-        }
-        
-        GameShow.showNotification('All scores have been reset!', 'info');
-        
-        // Update display
-        updateScoreDisplay();
-        highlightHighScore();
-        
-    } catch (error) {
-        GameShowUtils.handleError(error, 'Resetting scores');
+        });
     }
 }
 
-// Override the onclick functions to use our event handlers
-window.updateScore = function(playerId, points) {
-    addToUpdateQueue(playerId, points);
-};
+function syncInputFieldsWithScores() {
+    if (GameShow.currentScores) {
+        Object.entries(GameShow.currentScores).forEach(([playerName, score]) => {
+            const playerId = getPlayerIdFromName(playerName);
+            if (playerId !== null) {
+                const favorInputs = GameShowUtils.getAllElements(`.favor-value-input[data-player-id="${playerId}"]`);
+                favorInputs.forEach(element => {
+                    // Always sync the input field with the current score
+                    element.value = GameShow.formatNumber(score);
+                });
+            }
+        });
+    }
+}
 
-window.resetScores = function() {
-    resetScores();
-};
-
-// Add keyboard shortcuts for score updates
+// Keyboard shortcuts for favor updates
 document.addEventListener('keydown', function(event) {
-    // Only handle if we're on the scores page
     if (window.location.pathname !== '/') return;
     
     const playerId = event.key === '1' ? 0 : 
@@ -209,7 +412,6 @@ document.addEventListener('keydown', function(event) {
     if (playerId !== null) {
         let points = 0;
         
-        // Shift + number = add points, Ctrl + number = subtract points
         if (event.shiftKey) {
             points = 100;
         } else if (event.ctrlKey) {
@@ -218,35 +420,18 @@ document.addEventListener('keydown', function(event) {
         
         if (points !== 0) {
             event.preventDefault();
-            addToUpdateQueue(playerId, points);
-            GameShow.showNotification(
-                `${points > 0 ? '+' : ''}${points} points for Player ${playerId + 1}`,
-                points > 0 ? 'success' : 'warning'
-            );
+            const playerName = getPlayerNameFromId(playerId);
+            if (playerName) {
+                const currentScore = GameShow.currentScores[playerName] || DEFAULT_FAVOR;
+                updateFavorValue(playerId, currentScore + points);
+            }
         }
-    }
-    
-    // R key to reset scores
-    if (event.key === 'r' || event.key === 'R') {
-        event.preventDefault();
-        resetScores();
     }
 });
 
-// Add visual feedback for score changes
-function addScoreChangeIndicator(playerId, points) {
-    const playerCard = GameShowUtils.getElement(`[data-player-id="${playerId}"]`);
-    if (!playerCard) return;
-    
-    const indicator = document.createElement('div');
-    indicator.className = `score-change-indicator ${points > 0 ? 'positive' : 'negative'}`;
-    indicator.textContent = `${points > 0 ? '+' : ''}${points}`;
-    
-    playerCard.appendChild(indicator);
-    
-    setTimeout(() => {
-        if (indicator.parentNode) {
-            indicator.remove();
-        }
-    }, 1000);
-}
+// Auto-save state periodically and before page unload
+setInterval(saveStateToStorage, 10000); // Save every 10 seconds
+
+window.addEventListener('beforeunload', function() {
+    saveStateToStorage();
+});

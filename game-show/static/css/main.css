@@ -37,17 +37,6 @@ body.game-show-body {
     color: var(--dark-color);
 }
 
-/* Game Show Title Styling */
-.game-show-title {
-    color: var(--gold-color);
-    text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.7);
-    font-weight: bold;
-    font-size: 2rem;
-    margin-bottom: 1.5rem;
-    font-family: 'MedievalSharp', cursive;
-    letter-spacing: 2px;
-}
-
 /* User Directions Banner */
 .user-directions-banner {
     background: linear-gradient(135deg, var(--cream-color) 0%, var(--tan-color) 100%);

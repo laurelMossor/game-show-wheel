@@ -4,7 +4,7 @@
  */
 
 // Global variables
-let currentScores = {};
+let gameShowScores = {};
 let isUpdating = false;
 
 // Utility functions
@@ -62,8 +62,11 @@ async function apiCall(endpoint, options = {}) {
 // Score management functions
 async function fetchScores() {
     try {
+        console.log('fetchScores called - fetching from server...');
         const data = await apiCall('/api/scores');
-        currentScores = data.scores;
+        console.log('fetchScores received data:', data);
+        gameShowScores = data.scores;
+        console.log('fetchScores updated gameShowScores to:', gameShowScores);
         return data;
     } catch (error) {
         console.error('Failed to fetch scores:', error);
@@ -83,14 +86,15 @@ async function updateScore(playerId, points) {
         });
         
         if (data.success) {
-            currentScores = data.scores;
+            gameShowScores = data.scores;
             updateScoreDisplay();
-            showNotification(`Score updated! ${points > 0 ? '+' : ''}${points} points`, 'success');
             
-            // Add animation class
-            const scoreElement = GameShowUtils.getElement(`#score-${playerId}`);
-            if (scoreElement) {
-                GameShowUtils.animateElement(scoreElement, points > 0 ? 'score-change-positive' : 'score-change-negative', 800);
+            // Save to localStorage
+            try {
+                localStorage.setItem('gameShow_playerScores', JSON.stringify(gameShowScores));
+                console.log('Scores saved to localStorage after update');
+            } catch (error) {
+                console.warn('Failed to save scores to localStorage:', error);
             }
         }
     } catch (error) {
@@ -102,35 +106,12 @@ async function updateScore(playerId, points) {
 
 function updateScoreDisplay() {
     // Update all score displays
-    Object.entries(currentScores).forEach(([player, score]) => {
+    Object.entries(gameShowScores).forEach(([player, score]) => {
         const scoreElements = GameShowUtils.getAllElements(`[id^="score-"][id$="${player}"]`);
         scoreElements.forEach(element => {
             element.textContent = score;
         });
     });
-    
-    // Check for winner
-    checkWinner();
-}
-
-function checkWinner() {
-    if (!currentScores || Object.keys(currentScores).length === 0) return;
-    
-    const maxScore = Math.max(...Object.values(currentScores));
-    const winners = Object.entries(currentScores)
-        .filter(([player, score]) => score === maxScore)
-        .map(([player]) => player);
-    
-    const winnerSection = GameShowUtils.getElement('#winner-section');
-    const winnerName = GameShowUtils.getElement('#winner-name');
-    
-    if (winners.length === 1 && maxScore > 0) {
-        winnerName.textContent = winners[0];
-        GameShowUtils.addClass(winnerSection, 'fade-in');
-        winnerSection.style.display = 'block';
-    } else {
-        winnerSection.style.display = 'none';
-    }
 }
 
 // Navigation functions
@@ -169,44 +150,28 @@ document.addEventListener('keydown', function(event) {
     }
 });
 
-// Auto-refresh scores every 30 seconds
-setInterval(fetchScores, 30000);
-
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
-    // Fetch initial scores
-    fetchScores();
+    console.log('main.js DOMContentLoaded - current scores:', gameShowScores);
     
-    // Add loading states to buttons
-    GameShowUtils.getAllElements('.btn').forEach(button => {
-        GameShowUtils.initializeButtonState(button);
-        
-        button.addEventListener('click', function() {
-            if (this.classList.contains('btn-loading')) return;
-            
-            // Add loading state
-            GameShowUtils.setButtonState(this, true, 'Loading...');
-            
-            // Remove loading state after a delay (or when API call completes)
-            setTimeout(() => {
-                GameShowUtils.setButtonState(this, false);
-            }, 2000);
-        });
-    });
+    // Try to restore scores from localStorage first
+    const savedScores = localStorage.getItem('gameShow_playerScores');
+    if (savedScores) {
+        try {
+            gameShowScores = JSON.parse(savedScores);
+            console.log('Restored scores from localStorage:', gameShowScores);
+        } catch (error) {
+            console.warn('Error parsing saved scores:', error);
+        }
+    }
     
-    // Add smooth scrolling for anchor links
-    GameShowUtils.getAllElements('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            e.preventDefault();
-            const target = GameShowUtils.getElement(this.getAttribute('href'));
-            if (target) {
-                target.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
-            }
-        });
-    });
+    // Only fetch initial scores if we don't have any yet
+    if (!gameShowScores || Object.keys(gameShowScores).length === 0) {
+        console.log('No scores found, fetching from server...');
+        fetchScores();
+    } else {
+        console.log('Scores already exist, skipping fetch:', gameShowScores);
+    }
 });
 
 // Export functions for use in other modules
@@ -217,10 +182,9 @@ window.GameShow = {
     fetchScores,
     updateScore,
     updateScoreDisplay,
-    checkWinner,
     navigateToScores,
     navigateToWheel,
-    get currentScores() { return currentScores; }
+    get currentScores() { return gameShowScores; }
 };
 
 console.log('GameShow object exported to window:', window.GameShow);
