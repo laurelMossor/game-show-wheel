@@ -1,0 +1,259 @@
+/* Score Board Specific Styles */
+
+.score-container {
+    padding: 20px;
+}
+
+.score-board {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.player-score-card {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    border-radius: 20px;
+    padding: 2rem;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+    border: 3px solid transparent;
+    position: relative;
+    overflow: hidden;
+}
+
+.player-score-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--gold-color), var(--silver-color), var(--bronze-color));
+}
+
+.player-score-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    border-color: var(--gold-color);
+}
+
+.player-score-card:nth-child(1)::before {
+    background: var(--gold-color);
+}
+
+.player-score-card:nth-child(2)::before {
+    background: var(--silver-color);
+}
+
+.player-score-card:nth-child(3)::before {
+    background: var(--bronze-color);
+}
+
+.player-header {
+    margin-bottom: 1.5rem;
+    position: relative;
+}
+
+.player-name {
+    color: var(--primary-color);
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.player-number {
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    border-radius: 50%;
+    line-height: 40px;
+    font-weight: bold;
+    font-size: 1.2rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.score-display {
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, var(--light-color) 0%, #ffffff 100%);
+    border-radius: 15px;
+    border: 2px solid var(--light-color);
+}
+
+.score-value {
+    display: block;
+    font-size: 3rem;
+    font-weight: bold;
+    color: var(--primary-color);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 0.5rem;
+}
+
+.score-label {
+    display: block;
+    font-size: 0.9rem;
+    color: var(--secondary-color);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: 600;
+}
+
+.score-controls {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+}
+
+.score-btn {
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    border-radius: 15px;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.score-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.game-controls {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 2rem;
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.game-controls .btn {
+    margin: 0 0.5rem;
+    min-width: 150px;
+}
+
+.winner-announcement {
+    background: linear-gradient(135deg, var(--gold-color) 0%, #f39c12 100%);
+    padding: 2rem;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    animation: bounce 1s ease-in-out;
+}
+
+.winner-text {
+    color: white;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    margin: 0;
+}
+
+/* Score Update Animations */
+.score-update {
+    animation: scorePulse 0.6s ease-in-out;
+}
+
+@keyframes scorePulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .score-board {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .player-score-card {
+        padding: 1.5rem;
+    }
+    
+    .score-value {
+        font-size: 2.5rem;
+    }
+    
+    .score-controls {
+        grid-template-columns: 1fr;
+    }
+    
+    .game-controls .btn {
+        display: block;
+        width: 100%;
+        margin: 0.5rem 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .score-container {
+        padding: 10px;
+    }
+    
+    .player-score-card {
+        padding: 1rem;
+    }
+    
+    .score-value {
+        font-size: 2rem;
+    }
+    
+    .player-name {
+        font-size: 1.2rem;
+    }
+}
+
+/* Loading States */
+.score-loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.score-loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid var(--secondary-color);
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+/* High Score Highlighting */
+.high-score {
+    border-color: var(--gold-color) !important;
+    box-shadow: 0 0 20px rgba(241, 196, 15, 0.3);
+}
+
+.high-score .score-value {
+    color: var(--gold-color);
+}
+
+/* Score Change Indicators */
+.score-change-positive {
+    animation: scoreIncrease 0.8s ease-out;
+}
+
+.score-change-negative {
+    animation: scoreDecrease 0.8s ease-out;
+}
+
+@keyframes scoreIncrease {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1) rotate(5deg); }
+    100% { transform: scale(1); }
+}
+
+@keyframes scoreDecrease {
+    0% { transform: scale(1); }
+    50% { transform: scale(0.9) rotate(-5deg); }
+    100% { transform: scale(1); }
+}

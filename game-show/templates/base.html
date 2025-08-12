@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Game Show{% endblock %}</title>
+    
+    <!-- Bootstrap CSS for responsive design -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    {% block extra_css %}{% endblock %}
+    
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="game-show-body">
+    <!-- Navigation Header -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-gamepad"></i> Game Show
+            </a>
+            
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="/" id="nav-scores">
+                    <i class="fas fa-trophy"></i> Scores
+                </a>
+                <a class="nav-link" href="/wheel" id="nav-wheel">
+                    <i class="fas fa-circle-notch"></i> Wheel
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container-fluid mt-3">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer mt-auto py-3 bg-dark text-white text-center">
+        <div class="container">
+            <span>Game Show v1.0 | Use F1 for Scores, F2 for Wheel</span>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JavaScript -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block extra_js %}{% endblock %}
+    
+    <!-- Keyboard Navigation -->
+    <script>
+        document.addEventListener('keydown', function(event) {
+            switch(event.key) {
+                case 'F1':
+                    event.preventDefault();
+                    window.location.href = '/';
+                    break;
+                case 'F2':
+                    event.preventDefault();
+                    window.location.href = '/wheel';
+                    break;
+            }
+        });
+        
+        // Highlight current nav item
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentPath = window.location.pathname;
+            if (currentPath === '/') {
+                document.getElementById('nav-scores').classList.add('active');
+            } else if (currentPath === '/wheel') {
+                document.getElementById('nav-wheel').classList.add('active');
+            }
+        });
+    </script>
+</body>
+</html>

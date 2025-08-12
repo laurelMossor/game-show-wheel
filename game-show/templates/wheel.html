@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Game Show - Spinning Wheel{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/wheel.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="wheel-container">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="text-center mb-4 game-show-title">
+                <i class="fas fa-circle-notch"></i> Spinning Wheel of Fortune
+            </h1>
+        </div>
+    </div>
+
+    <!-- Wheel Display -->
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="wheel-section text-center">
+                <div class="wheel-wrapper">
+                    <canvas id="wheel-canvas" width="400" height="400"></canvas>
+                    <div class="wheel-pointer"></div>
+                </div>
+                
+                <div class="wheel-controls mt-4">
+                    <button class="btn btn-primary btn-lg" id="spin-button" onclick="spinWheel()">
+                        <i class="fas fa-play"></i> SPIN THE WHEEL!
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/wheel.js') }}"></script>
+{% endblock %}

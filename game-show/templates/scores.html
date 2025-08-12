@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}Game Show - Scores{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/scores.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="score-container">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="text-center mb-4 game-show-title">
+                <i class="fas fa-trophy"></i> Game Show Scoreboard
+            </h1>
+        </div>
+    </div>
+
+    <!-- Score Display -->
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="score-board">
+                {% for player in players %}
+                <div class="player-score-card" data-player-id="{{ loop.index0 }}">
+                    <div class="player-header">
+                        <h3 class="player-name">{{ player }}</h3>
+                        <div class="player-number">{{ loop.index }}</div>
+                    </div>
+                    <div class="score-display">
+                        <span class="score-value" id="score-{{ loop.index0 }}">{{ scores[player] }}</span>
+                        <span class="score-label">POINTS</span>
+                    </div>
+                    <div class="score-controls">
+                        <button class="btn btn-success btn-sm score-btn" onclick="updateScore({{ loop.index0 }}, 100)">
+                            <i class="fas fa-plus"></i> 100
+                        </button>
+                        <button class="btn btn-warning btn-sm score-btn" onclick="updateScore({{ loop.index0 }}, 50)">
+                            <i class="fas fa-plus"></i> 50
+                        </button>
+                        <button class="btn btn-info btn-sm score-btn" onclick="updateScore({{ loop.index0 }}, 25)">
+                            <i class="fas fa-plus"></i> 25
+                        </button>
+                        <button class="btn btn-danger btn-sm score-btn" onclick="updateScore({{ loop.index0 }}, -100)">
+                            <i class="fas fa-minus"></i> 100
+                        </button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Controls -->
+    <div class="row justify-content-center mt-4">
+        <div class="col-md-6">
+            <div class="game-controls text-center">
+                <button class="btn btn-primary btn-lg me-3" onclick="resetScores()">
+                    <i class="fas fa-redo"></i> Reset All Scores
+                </button>
+                <button class="btn btn-success btn-lg" onclick="window.location.href='/wheel'">
+                    <i class="fas fa-circle-notch"></i> Spin the Wheel
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Winner Display -->
+    <div class="row justify-content-center mt-4" id="winner-section" style="display: none;">
+        <div class="col-md-6">
+            <div class="winner-announcement text-center">
+                <h2 class="winner-text">
+                    <i class="fas fa-crown"></i> 
+                    <span id="winner-name"></span> Wins!
+                </h2>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/scores.js') }}"></script>
+{% endblock %}
