@@ -1,7 +1,7 @@
 /* Wheel Interface Specific Styles - Medieval Fantasy Theme */
 
 .wheel-container {
-    padding: 15px;
+    padding: 20px;
 }
 
 .wheel-section {
@@ -109,11 +109,81 @@
     font-family: 'Cinzel', serif;
 }
 
-.result-text {
-    font-size: 1.2rem;
-    color: var(--deep-brown);
-    font-style: italic;
-    font-family: 'Crimson Text', serif;
+/* Result Banner */
+.result-banner {
+    padding: 20px;
+    position: relative;
+    height: 80px; /* Fixed height - no min-height */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden; /* Prevent any content overflow */
+}
+
+.result-banner .result-text {
+    font-family: 'MedievalSharp', cursive;
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: var(--medieval-gold);
+    text-shadow: 
+        2px 2px 0px var(--medieval-brown-dark),
+        4px 4px 8px rgba(0, 0, 0, 0.5);
+    letter-spacing: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 60px; /* Fixed height - no min-height */
+    width: 100%;
+    padding: 10px 20px;
+    line-height: 1; /* Fixed line height */
+    white-space: nowrap; /* Prevent text wrapping */
+    overflow: hidden; /* Hide any overflow */
+    text-overflow: ellipsis; /* Show ellipsis if text is too long */
+}
+
+/* Rich goldish brown gradient for blinking text */
+.result-text.blinking {
+    background: linear-gradient(135deg, #DAA520 0%, #B8860B 25%, #CD853F 50%, #D2691E 75%, #8B4513 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: richGradientBlink 0.8s ease-in-out infinite alternate;
+    text-shadow: none; /* Remove text shadow for gradient effect */
+}
+
+/* Rich gradient blinking animation */
+@keyframes richGradientBlink {
+    0% {
+        background: linear-gradient(135deg, #DAA520 0%, #B8860B 25%, #CD853F 50%, #D2691E 75%, #8B4513 100%);
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        opacity: 1;
+    }
+    100% {
+        background: linear-gradient(135deg, #DAA520 0%, #B8860B 25%, #CD853F 50%, #D2691E 75%, #8B4513 100%);
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        opacity: 0;
+    }
+}
+
+/* Special styling for when result is displayed */
+.result-banner.has-result .result-text {
+    color: var(--medieval-gold);
+    text-shadow: 
+        2px 2px 0px var(--medieval-brown-dark),
+        4px 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+/* Ensure gradient takes precedence when blinking */
+.result-banner.has-result .result-text.blinking {
+    background: linear-gradient(135deg, #DAA520 0%, #B8860B 25%, #CD853F 50%, #D2691E 75%, #8B4513 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: none;
 }
 
 .result-actions .btn {

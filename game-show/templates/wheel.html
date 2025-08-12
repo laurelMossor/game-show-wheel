@@ -10,9 +10,9 @@
 <div class="wheel-container">
     <div class="row">
         <div class="col-12">
-            <h1 class="text-center mb-3 game-show-title">
-                <i class="fas fa-circle-notch"></i> Spinning Wheel of Fortune
-            </h1>
+            <div class="result-banner text-center mb-3" id="result-banner">
+                <span class="result-text" id="result-text">{{ result_text|default('', true) }}</span>
+            </div>
         </div>
     </div>
 

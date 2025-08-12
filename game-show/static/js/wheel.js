@@ -200,7 +200,7 @@ function drawWheel() {
         wheelContext.rotate(textAngle);
         
         // Enhanced text styling with bigger, bolder text
-        wheelContext.fillStyle = '#2C3E50'; // Dark blue-gray for better readability
+        wheelContext.fillStyle = '#2C3E50'; // Dark blue-gray for better readability on wheel segments
         wheelContext.font = `${config.TEXT_WEIGHT || 'bold'} ${config.TEXT_SIZE || 20}px "Cinzel", serif`;
         wheelContext.textAlign = 'center';
         wheelContext.textBaseline = 'middle';
@@ -310,6 +310,9 @@ async function spinWheel() {
     const spinButton = document.querySelector('#spin-button');
     const config = window.WheelConfig?.WHEEL_CONFIG || {};
     
+    // Reset the result banner for new spin
+    resetResultBanner();
+    
     // Set button to loading state
     GameShowUtils.setButtonState(spinButton, true, 'Spinning...', '<i class="fas fa-play"></i> SPIN THE WHEEL!');
     
@@ -376,6 +379,21 @@ async function spinWheel() {
     }
 }
 
+// Function to reset the result banner
+function resetResultBanner() {
+    const resultBanner = document.getElementById('result-banner');
+    const resultText = document.getElementById('result-text');
+    
+    if (!resultBanner || !resultText) return;
+    
+    // Clear the text but maintain the same dimensions
+    resultText.textContent = '';
+    resultText.classList.remove('blinking');
+    
+    // Remove result styling
+    resultBanner.classList.remove('has-result');
+}
+
 function handleSpinSuccess(data, spinButton) {
     const config = window.WheelConfig?.WHEEL_CONFIG || {};
     
@@ -403,7 +421,62 @@ function handleSpinSuccess(data, spinButton) {
         isSpinning = false;
         GameShowUtils.setButtonState(spinButton, false);
         wheelCanvas.classList.remove('wheel-glow-spinning');
+        
+        // Display the result in the banner
+        displayResult(data.result);
     });
+}
+
+// Function to display the winning result
+function displayResult(result) {
+    const resultBanner = document.getElementById('result-banner');
+    const resultText = document.getElementById('result-text');
+    
+    if (!resultBanner || !resultText) return;
+    
+    // Calculate which segment the pointer is pointing to based on current rotation
+    const segmentAngle = (2 * Math.PI) / wheelSegments.length;
+    
+    // The leaf icon points to the right (3 o'clock position, which is 0 radians)
+    // We need to find which segment contains the current rotation position
+    // Since the wheel rotates clockwise, we need to account for the rotation
+    let normalizedRotation = currentRotation % (2 * Math.PI);
+    if (normalizedRotation < 0) normalizedRotation += 2 * Math.PI;
+    
+    // The leaf icon points to the right (0 radians), so we need to find
+    // which segment is currently at the 3 o'clock position
+    // Since segments are drawn clockwise starting from the top, we need to adjust
+    const rightPosition = 0; // 3 o'clock position
+    let adjustedRotation = (rightPosition - normalizedRotation) % (2 * Math.PI);
+    if (adjustedRotation < 0) adjustedRotation += 2 * Math.PI;
+    
+    // Find the segment index based on the right position
+    const segmentIndex = Math.floor(adjustedRotation / segmentAngle) % wheelSegments.length;
+    const selectedSegment = wheelSegments[segmentIndex];
+    
+    if (selectedSegment) {
+        // Display the result in CAPS with dramatic styling
+        resultText.textContent = selectedSegment.text.toUpperCase();
+        
+        // Add result styling class for enhanced blinking
+        resultBanner.classList.add('has-result');
+        
+        // Add blinking effect
+        resultText.classList.add('blinking');
+        
+        // Log the result for debugging
+        console.log(`🎯 Wheel landed on: ${selectedSegment.text} (Segment ${segmentIndex})`);
+        console.log(`📍 Current rotation: ${(currentRotation * 180 / Math.PI).toFixed(1)}°`);
+        console.log(`🎲 Normalized rotation: ${(normalizedRotation * 180 / Math.PI).toFixed(1)}°`);
+        console.log(`🎯 Right position: ${(rightPosition * 180 / Math.PI).toFixed(1)}°`);
+        console.log(`📐 Adjusted rotation: ${(adjustedRotation * 180 / Math.PI).toFixed(1)}°`);
+        console.log(`📐 Segment angle: ${(segmentAngle * 180 / Math.PI).toFixed(1)}°`);
+    } else {
+        // This should never happen, but if it does, show error message
+        console.error('Could not determine selected segment');
+        resultText.textContent = 'ERROR - PLEASE SPIN AGAIN';
+        resultText.classList.remove('blinking');
+    }
 }
 
 function animateWheelSpin(targetRotation, onComplete) {

@@ -23,6 +23,11 @@
     --deep-brown: #654321;         /* Dark Brown */
     --warm-yellow: #F0E68C;        /* Khaki */
     --muted-green: #8FBC8F;        /* Dark Sea Green */
+    
+    /* Medieval Gold and Brown Variables */
+    --medieval-gold: #DAA520;      /* Goldenrod */
+    --medieval-brown: #8B4513;     /* Saddle Brown */
+    --medieval-brown-dark: #654321; /* Dark Brown */
 }
 
 body.game-show-body {
