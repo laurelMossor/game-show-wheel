@@ -1,117 +1,44 @@
-# Game Show Program
+# 🎭 Game Show Program
 
-Interactive game show program with score tracking and spinning wheel, designed for desktop and laptop computers.
+Interactive medieval-themed game show application with score tracking and spinning wheel. Two versions available: classic Flask/HTML and modern Next.js/React.
 
-## Tech Stack
+## 🚀 Quick Start
 
-### V1 (Original)
-- **Backend**: Python Flask
-- **Frontend**: HTML, CSS, JavaScript  
-- **Deployment**: Local desktop/laptop deployment
-- **UI**: Responsive design with medieval fantasy theme
-
-### V2 (React Refactor)
-- **Backend**: Python Flask (same as V1)
-- **Frontend**: Next.js 15 + React 19 + TypeScript
-- **Development**: Hot reload, TypeScript safety
-- **UI**: Modern React components with inline styling
-
-## Quick Start
-
-### V1 (Original Version)
-
-1. **Clone the repository**
-2. **Set up Python virtual environment**:
-   ```bash
-   cd game-show
-   python3 -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   pip install -r requirements.txt
-   ```
-3. **Run the application**:
-   ```bash
-   python app.py
-   ```
-4. **Open browser**: Navigate to `http://localhost:5000`
-
-### V2 (React Version)
-
-#### Prerequisites
-- **Node.js** (v24.6.0 or later)
-- **Python 3** for backend
-
-#### Frontend Setup
+### V2 (Next.js - Recommended)
 ```bash
-cd gameshow-V2/frontend
+cd gameshow-app
 npm install
 npm run dev
+# Open http://localhost:3000
 ```
-Frontend will run at `http://localhost:3000`
 
-#### Backend Setup  
+### V1 (Flask)  
 ```bash
-cd gameshow-V2/server
+cd game-show
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 python app.py
-```
-Backend API will run at `http://localhost:5001`
-
-#### Full Development Setup
-Run both frontend and backend simultaneously:
-
-**Terminal 1 (Backend):**
-```bash
-cd gameshow-V2/server
-source venv/bin/activate
-python app.py
+# Open http://localhost:5000
 ```
 
-**Terminal 2 (Frontend):**
-```bash
-cd gameshow-V2/frontend  
-npm run dev
-```
+## ✨ Key Features
 
-Then open `http://localhost:3000` in your browser.
+- **🏆 Score Tracking**: Three players with editable names and adjustable scores
+- **🎯 Spinning Wheel**: Interactive medieval-styled wheel with various outcomes
+- **💾 Persistence**: Game state automatically saved (localStorage in V2, memory in V1)
+- **⌨️ Keyboard Controls**: F1 for scores, F2 for wheel, Space/Enter to spin
+- **🎨 Medieval Theme**: Rich medieval fantasy styling with custom fonts
 
-## Usage
-
-### V1 Features
-- **Score Tracking**: Main page shows three player scores with +/- controls
-- **Spinning Wheel**: Navigate to `/wheel` for the interactive spinning wheel
-- **Keyboard Shortcuts**: 
-  - F1: Return to scores
-  - F2: Go to wheel
-  - Space/Enter: Spin wheel (when on wheel page)
-
-### V2 Features  
-- **Score Tracking**: React-based score board with real-time updates
-- **Spinning Wheel**: Canvas-based wheel with smooth animations
-- **TypeScript**: Full type safety and better developer experience
-- **Hot Reload**: Instant updates during development
-- **Component Architecture**: Modular, reusable React components
-
-## Development Status
-
-### V1 ✅ Complete
-- Fully functional game show application
-- Ready for local desktop/laptop deployment
-- Medieval fantasy theme with animations
-
-### V2 🔄 In Progress  
-- ✅ Backend migration complete
-- ✅ React frontend foundation complete
-- ✅ Core components (ScoreBoard, PlayerCard, SpinningWheel)
-- ✅ TypeScript configuration
-- 🔄 **Next**: Connect frontend to backend APIs
-
-## Project Structure
+## 📁 Project Structure
 
 ```
 game-show-wheel/
-├── game-show/              # V1 - Original Flask app
+├── gameshow-app/           # V2 - Next.js (recommended)
+│   ├── src/app/           # Pages: /, /scores, /wheel
+│   ├── src/components/    # React components
+│   └── package.json
+├── game-show/             # V1 - Flask/HTML
 │   ├── app.py
 │   ├── server/
 │   ├── static/
@@ -131,14 +58,15 @@ game-show-wheel/
 └── project-plan.md         # Detailed development plan
 ```
 
-## Contributing
+## 🎮 How to Use
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+- **Landing Page**: Overview and navigation
+- **Score Board**: Manage player names and scores (+/-1, +/-10 buttons)
+- **Spinning Wheel**: Click to spin or use Space/Enter
+- **Navigation**: F1 for scores, F2 for wheel
 
-## License
+## 🔧 Requirements
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+- **V2**: Node.js 18+
+- **V1**: Python 3.7+
+- Modern web browser with localStorage support
