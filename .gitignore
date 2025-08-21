@@ -9,3 +9,12 @@ __pycache__/
 *.pyzw
 *.pyzwz
 *.pyzwzw
+**/node_modules/
+**/dist/
+**/build/
+**/out/
+**/target/
+**/venv/
+**/env/
+**/env.bak/
+**/env.bak.bak/

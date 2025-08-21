@@ -1,14 +1,14 @@
 # Game Show Program - Project Plan
 
 ## Project Overview
-A game show program designed to run on a Raspberry Pi with two main interfaces:
+A game show program designed to run on desktop/laptop computers with two main interfaces:
 1. **Score Tracking Interface** - Visual display for tracking scores of three players
 2. **Spinning Wheel Interface** - Interactive wheel that players can spin to determine outcomes
 
 ## Technology Decision: HTML + Simple Web Server ✅
 
 **Selected Approach:** HTML + Python Web Server (Flask)
-**Rationale:** Best balance of development speed, visual quality, and Pi performance
+**Rationale:** Best balance of development speed, visual quality, and local performance
 
 **Pros:**
 - Cross-platform compatibility
@@ -19,7 +19,7 @@ A game show program designed to run on a Raspberry Pi with two main interfaces:
 - Perfect for score tracking + spinning wheel mechanics
 
 **Cons:**
-- Requires browser installation on Pi
+- Requires browser (widely available)
 - Slightly more complex setup than pure Python
 
 ## MVP Development Pathway
@@ -55,98 +55,71 @@ A game show program designed to run on a Raspberry Pi with two main interfaces:
    - Connect wheel results to score system
    - Add wheel-to-score navigation
 
-### Phase 3: Pi Deployment & Polish (Week 3)
-1. **Pi Setup & Configuration**
-   - Browser installation and configuration
-   - Auto-startup configuration
+### Phase 3: Local Deployment & Polish (Week 3)
+1. **Local Setup & Configuration**
+   - Cross-platform compatibility testing
+   - Easy startup scripts
    - Performance optimization
 
 2. **User Experience**
-   - CLI navigation between screens
+   - Navigation between screens
    - Keyboard shortcuts
    - Visual polish and animations
 
 3. **Testing & Refinement**
-   - Pi hardware testing
+   - Cross-browser testing
    - Performance optimization
    - Bug fixes and improvements
 
-## Raspberry Pi Setup Instructions
+## Local Setup Instructions
 
 ### Prerequisites
-- Raspberry Pi (3B+ or 4 recommended)
-- MicroSD card with Raspberry Pi OS
-- Display and input devices
-- Power supply
+- Modern computer (Windows, macOS, or Linux)
+- Python 3.7+ installed
+- Web browser (Chrome, Firefox, Safari, Edge)
 
-### Step 1: Initial Pi Setup
+### Step 1: Project Setup
 ```bash
-# Update system
-sudo apt update && sudo apt upgrade -y
+# Clone/download project
+git clone <repository-url>
+cd game-show-wheel
 
-# Install Python dependencies
-sudo apt install python3-pip python3-venv -y
-
-# Install browser (Chromium recommended for Pi)
-sudo apt install chromium-browser -y
+# Navigate to desired version
+cd game-show        # For V1
+# OR
+cd gameshow-V2      # For V2
 ```
 
-### Step 2: Project Setup
+### Step 2: V1 Setup (Flask + HTML)
 ```bash
-# Clone/create project directory
-mkdir ~/game-show
-cd ~/game-show
+cd game-show
 
 # Create virtual environment
 python3 -m venv venv
-source venv/bin/activate
+source venv/bin/activate  # On Windows: venv\Scripts\activate
 
 # Install Python requirements
-pip install flask
+pip install -r requirements.txt
+
+# Run the application
+python app.py
 ```
 
-### Step 3: Browser Auto-Launch Configuration
+### Step 3: V2 Setup (React + Flask)
 ```bash
-# Create desktop entry for auto-startup
-mkdir -p ~/.config/autostart
-cat > ~/.config/autostart/game-show.desktop << EOF
-[Desktop Entry]
-Type=Application
-Name=Game Show
-Exec=chromium-browser --kiosk --disable-web-security --user-data-dir=/tmp/game-show http://localhost:5000
-Hidden=false
-NoDisplay=false
-X-GNOME-Autostart-enabled=true
-EOF
+# Backend setup
+cd gameshow-V2/backend
+python3 -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+pip install -r requirements.txt
 
-# Make executable
-chmod +x ~/.config/autostart/game-show.desktop
-```
+# Frontend setup (in new terminal)
+cd gameshow-V2/frontend
+npm install
 
-### Step 4: System Service Setup
-```bash
-# Create systemd service for auto-startup
-sudo tee /etc/systemd/system/game-show.service << EOF
-[Unit]
-Description=Game Show Flask Server
-After=network.target
-
-[Service]
-Type=simple
-User=pi
-WorkingDirectory=/home/pi/game-show
-Environment=PATH=/home/pi/game-show/venv/bin
-ExecStart=/home/pi/game-show/venv/bin/python app.py
-Restart=always
-RestartSec=10
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
-# Enable and start service
-sudo systemctl enable game-show.service
-sudo systemctl start game-show.service
+# Run both (in separate terminals)
+# Terminal 1: python app.py (in backend folder)
+# Terminal 2: npm run dev (in frontend folder)
 ```
 
 ## Technical Architecture
@@ -253,3 +226,188 @@ static/
 - **Week 2**: Spinning wheel implementation
 - **Week 3**: Pi deployment and polish
 - **Week 4**: Testing and optimization
+
+---
+
+# Game Show V2 - React/Next.js Refactor Plan
+
+## Project Overview V2
+Refactor the existing game show application to use modern React 19 with Next.js frontend and Python Flask backend. This version will provide better performance, maintainability, and developer experience while maintaining all existing functionality for local desktop/laptop use.
+
+## Technology Stack V2
+
+### Frontend
+- **Next.js 15** with App Router
+- **React 19** 
+- **CSS Modules** (built into Next.js)
+
+### Backend
+- **Flask** (keeping it simple like V1)
+- **In-memory storage** (no database needed)
+- **Same endpoints as V1** for compatibility
+
+## Architecture V2
+
+### Project Structure
+```
+gameshow-V2/
+├── frontend/                # Next.js React app
+│   ├── src/
+│   │   ├── app/            # App router pages
+│   │   │   ├── page.tsx    # Score tracking page
+│   │   │   ├── wheel/
+│   │   │   │   └── page.tsx # Wheel interface
+│   │   │   └── layout.tsx  # Root layout
+│   │   ├── components/     # React components
+│   │   │   ├── ScoreBoard.tsx
+│   │   │   ├── SpinningWheel.tsx
+│   │   │   └── PlayerCard.tsx
+│   │   └── styles/         # CSS modules
+│   ├── package.json
+│   └── next.config.js
+└── backend/                # Simple Flask server
+    ├── app.py              # Main Flask app (same as V1)
+    ├── game_state.py       # Score tracking (same as V1)
+    ├── wheel_logic.py      # Wheel mechanics (same as V1)
+    └── requirements.txt
+```
+
+## API Design V2
+
+### REST Endpoints (Same as V1)
+- `GET /` - Score display page
+- `GET /wheel` - Wheel interface page
+- `POST /api/scores/update` - Update player scores
+- `POST /api/wheel/spin` - Trigger wheel spin
+- `GET /api/scores` - Get current scores
+
+## Component Architecture
+
+### React Components
+1. **ScoreBoard.tsx**
+   - Displays three player scores
+   - Score increase/decrease controls
+   - Uses fetch API to update backend
+
+2. **SpinningWheel.tsx**
+   - Basic wheel with CSS animations (add fancy animations later)
+   - Spin button and result display
+   - Integration with score system
+
+3. **PlayerCard.tsx**
+   - Individual player score display
+   - Score adjustment controls
+
+## Development Plan V2
+
+### Phase 1: Backend Migration (Day 1) ✅ COMPLETED
+1. **Copy Existing Backend** ✅
+   - ✅ Copied V1 Flask server to V2 backend folder
+   - ✅ Files copied: app.py, game_state.py, wheel_logic.py, requirements.txt
+   - ✅ Same endpoints maintained for compatibility
+
+### Phase 2: Frontend Setup (Day 2-3) ✅ COMPLETED  
+1. **Next.js Setup** ✅
+   - ✅ Node.js v24.6.0 installed via Homebrew
+   - ✅ Next.js 15 project initialized with TypeScript
+   - ✅ React 19 RC configured for compatibility
+   - ✅ TypeScript configuration completed
+
+2. **Core Components** ✅
+   - ✅ ScoreBoard component created
+   - ✅ PlayerCard component created  
+   - ✅ Basic pages created (/ for scores, /wheel for wheel)
+   - ✅ CSS styling with inline styles (simplified approach)
+
+### Phase 3: Wheel Component (Day 4-5) ✅ COMPLETED
+1. **Basic Wheel** ✅
+   - ✅ SpinningWheel React component created
+   - ✅ Canvas-based wheel rendering 
+   - ✅ Basic spin animation with easing
+   - ✅ Result calculation and display
+   - ✅ Ready to connect to backend API
+
+### Phase 4: Integration (Next)
+1. **Backend Connection**
+   - Connect React frontend to Flask backend
+   - Test API endpoints from React components
+   - Ensure score updates work between frontend/backend
+
+### Phase 5: Polish (Later - when we want animations)
+1. **Enhanced Animations**
+   - Add Framer Motion when needed
+   - Improve wheel physics
+   - Add visual effects
+
+### Phase 6: Distribution (Optional)
+1. **Packaging Options**
+   - Electron app for desktop distribution
+   - Docker containers for easy deployment
+   - Executable builds for non-technical users
+
+## Migration Strategy
+
+### From V1 to V2
+1. **Data Migration**
+   - Export existing game configurations
+   - Migrate wheel segment configurations
+   - Preserve any saved game states
+
+2. **Feature Parity**
+   - Ensure all V1 features work in V2
+   - Maintain same keyboard shortcuts
+   - Keep familiar UI/UX patterns
+
+3. **Deployment Options**
+   - Side-by-side deployment for testing
+   - Gradual rollout capability
+   - Rollback plan if needed
+
+## Performance Targets V2
+
+### Startup Time
+- Backend server: < 2 seconds
+- Frontend build: < 5 seconds
+- Total startup: < 7 seconds (improvement from V1)
+
+### Memory Usage
+- Backend: < 30MB (improvement from V1)
+- Frontend bundle: < 2MB gzipped
+- Runtime memory: < 150MB total
+
+### User Experience
+- Score updates: < 50ms (improvement from V1)
+- Wheel animations: 60fps with hardware acceleration
+- Page transitions: < 200ms
+
+## Success Criteria V2
+
+### Technical Improvements
+- [ ] 50% faster score updates
+- [ ] Reduced memory usage
+- [ ] Better error handling and recovery
+- [x] Type safety with TypeScript ✅
+- [x] Better code organization and maintainability ✅
+
+
+
+### Development Experience
+- [x] Hot reload during development ✅
+- [x] Better debugging tools ✅
+- [ ] Automated testing setup
+- [ ] CI/CD pipeline ready
+- [ ] Docker deployment
+
+## Current Status V2
+
+### ✅ Completed
+- Backend migration (Flask server copied and ready)
+- Frontend foundation (Next.js + React 19 + TypeScript)
+- Core components (ScoreBoard, PlayerCard, SpinningWheel)
+- Basic wheel functionality with canvas rendering
+- Development environment setup
+
+### 🔄 Next Steps
+- Connect frontend to backend APIs
+- Test full application flow
+- Cross-platform testing and optimization
