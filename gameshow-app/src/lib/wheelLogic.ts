@@ -117,45 +117,85 @@ export class WheelManager {
 	}
 
 	/**
-	* Spin the wheel and return result
+	* Generate spin parameters for animation
 	*/
-	async spin(): Promise<SpinResult> {
-		if (this.isSpinning) {
-			throw new Error('Wheel is already spinning');
+	generateSpin(): { totalRotation: number; duration: number } {
+		// Calculate spin parameters
+		const baseRotations = 5; // Always spin about 5 full rotations
+		const extraRotations = Math.random() * 2; // Add 0-2 extra rotations
+		const totalRotations = (baseRotations + extraRotations) * 360;
+
+		// Generate a random final angle (where the wheel stops)
+		const randomFinalAngle = Math.random() * 360;
+		const totalRotation = totalRotations + randomFinalAngle;
+
+		return {
+			totalRotation,
+			duration: this.config.spinDuration
+		};
+	}
+
+	/**
+	* Calculate winner based on final wheel position and optionally snap to center
+	*/
+	calculateWinnerAtPosition(finalRotation: number, snapToCenter: boolean = true): SpinResult {
+		const segmentAngle = 360 / this.config.segments.length;
+		
+		// Normalize the rotation
+		const normalizedRotation = ((finalRotation % 360) + 360) % 360;
+		
+		// Calculate the effective rotation for determining the winning segment
+		// The pointer is at 90 degrees (3 o'clock position)
+		const effectiveRotation = (360 - normalizedRotation) % 360;
+		const segmentIndex = Math.floor(effectiveRotation / segmentAngle) % this.config.segments.length;
+		const selectedSegment = this.config.segments[segmentIndex];
+
+		let adjustedRotation = finalRotation;
+		
+		if (snapToCenter) {
+			// Calculate the center angle of the winning segment
+			const segmentCenterAngle = segmentIndex * segmentAngle + (segmentAngle / 2);
+			
+			// Calculate how much we need to adjust to center the segment at the pointer
+			const targetRotation = (360 - segmentCenterAngle) % 360;
+			const currentEffectiveRotation = effectiveRotation % 360;
+			
+			// Find the smallest adjustment needed
+			let adjustment = (targetRotation - currentEffectiveRotation + 360) % 360;
+			if (adjustment > 180) adjustment -= 360;
+			
+			adjustedRotation = finalRotation + adjustment;
 		}
 
+		const result: SpinResult = {
+			segment: selectedSegment,
+			finalAngle: adjustedRotation,
+			duration: this.config.spinDuration,
+			winnerText: selectedSegment.text.toUpperCase()
+		};
+
+		return result;
+	}
+
+	/**
+	* Start spinning - sets spinning state
+	*/
+	startSpin(): void {
 		this.isSpinning = true;
+	}
 
-		try {
-			// Select random segment
-			const selectedSegment = this.config.segments[
-				Math.floor(Math.random() * this.config.segments.length)
-			];
+	/**
+	* Stop spinning - clears spinning state
+	*/
+	stopSpin(): void {
+		this.isSpinning = false;
+	}
 
-			// Calculate spin parameters
-			const baseRotations = 5; // Always spin about 5 full rotations
-			const extraRotations = Math.random() * 2; // Add 0-2 extra rotations
-			const totalRotations = (baseRotations + extraRotations) * 360;
-
-			// Calculate final angle with some randomness within the segment
-			const segmentAngle = 360 / this.config.segments.length;
-			const offset = (Math.random() * 0.5 + 0.25) * segmentAngle;
-			const finalAngle = selectedSegment.angle + offset;
-
-			const result: SpinResult = {
-				segment: selectedSegment,
-				finalAngle: (totalRotations + finalAngle) % 360,
-				duration: this.config.spinDuration,
-				winnerText: selectedSegment.text.toUpperCase()
-			};
-
-			// Simulate async spinning duration
-			await new Promise(resolve => setTimeout(resolve, this.config.spinDuration));
-
-			return result;
-		} finally {
-			this.isSpinning = false;
-		}
+	/**
+	* Legacy spin method for compatibility - now just generates spin parameters
+	*/
+	generateSpinParams(): { totalRotation: number; duration: number } {
+		return this.generateSpin();
 	}
 
 	/**
@@ -206,10 +246,10 @@ export class WheelManager {
 		const normalizedRotation = ((rotation % 360) + 360) % 360;
 		const segmentAngle = 360 / this.config.segments.length;
 
-		// The pointer points to the right (3 o'clock position = 0 degrees)
+		// The pointer points to the right (3 o'clock position = 90 degrees)
 		// We need to find which segment is at that position
-		const adjustedRotation = (360 - normalizedRotation) % 360;
-		const segmentIndex = Math.floor(adjustedRotation / segmentAngle) % this.config.segments.length;
+		const effectiveRotation = (360 - normalizedRotation) % 360;
+		const segmentIndex = Math.floor(effectiveRotation / segmentAngle) % this.config.segments.length;
 
 		return this.config.segments[segmentIndex] || null;
 	}

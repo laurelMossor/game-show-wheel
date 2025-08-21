@@ -18,25 +18,28 @@ export function useWheel() {
 		setIsSpinning(wheelManager.getIsSpinning());
 	}, []);
 
-	const spin = useCallback(async (): Promise<SpinResult> => {
+	const startSpin = useCallback((): { totalRotation: number; duration: number } => {
 		if (isSpinning) {
 			throw new Error('Wheel is already spinning');
 		}
 
 		setIsSpinning(true);
 		setLastResult(null);
+		wheelManager.startSpin();
 
-		try {
-			const result = await wheelManager.spin();
-			setLastResult(result);
-			return result;
-		} catch (error) {
-			console.error('Wheel spin failed:', error);
-			throw error;
-		} finally {
-			setIsSpinning(false);
-		}
+		return wheelManager.generateSpinParams();
 	}, [isSpinning]);
+
+	const stopSpin = useCallback(() => {
+		setIsSpinning(false);
+		wheelManager.stopSpin();
+	}, []);
+
+	const calculateWinnerAtPosition = useCallback((finalRotation: number, snapToCenter: boolean = true) => {
+		const result = wheelManager.calculateWinnerAtPosition(finalRotation, snapToCenter);
+		setLastResult(result);
+		return result;
+	}, []);
 
 	const randomizeColors = useCallback(() => {
 		wheelManager.randomizeColors();
@@ -76,7 +79,9 @@ export function useWheel() {
 		lastResult,
 
 		// Actions
-		spin,
+		startSpin,
+		stopSpin,
+		calculateWinnerAtPosition,
 		randomizeColors,
 		randomizeSegments,
 		setSpinDuration,

@@ -17,7 +17,9 @@ export default function SpinningWheel({ onSpinResult }: SpinningWheelProps) {
 		segments, 
 		canvasSize, 
 		isSpinning, 
-		spin
+		startSpin,
+		stopSpin,
+		calculateWinnerAtPosition
 	} = useWheel();
 
 	const drawWheel = useCallback(() => {
@@ -159,20 +161,7 @@ export default function SpinningWheel({ onSpinResult }: SpinningWheelProps) {
 		// Add wood grain to center circle
 		addWoodGrainTexture(ctx, centerX, centerY, centerRadius, centerRadius);
 
-		// Draw pointer (static arrow pointing down from top)
-		ctx.save();
-		ctx.translate(centerX, 20);
-		ctx.beginPath();
-		ctx.moveTo(0, 0);
-		ctx.lineTo(-15, -20);
-		ctx.lineTo(15, -20);
-		ctx.closePath();
-		ctx.fillStyle = '#ff4444';
-		ctx.fill();
-		ctx.strokeStyle = '#000';
-		ctx.lineWidth = 2;
-		ctx.stroke();
-		ctx.restore();
+		// Note: Pointer is now handled by the leaf icon positioned outside the canvas
 	}, [segments, currentRotation, canvasSize]);
 
 	// Function to add wood grain texture to circular elements
@@ -226,7 +215,7 @@ export default function SpinningWheel({ onSpinResult }: SpinningWheelProps) {
 		}
 	}, [segments, currentRotation, drawWheel]);
 
-	const animateWheel = useCallback((targetRotation: number, onComplete: () => void) => {
+	const animateWheel = useCallback((targetRotation: number, onComplete: (finalRotation: number) => void) => {
 		const startRotation = currentRotation;
 		const duration = 3000; // 3 seconds
 		const startTime = performance.now();
@@ -245,36 +234,40 @@ export default function SpinningWheel({ onSpinResult }: SpinningWheelProps) {
 			if (progress < 1) {
 				requestAnimationFrame(animate);
 			} else {
-				onComplete();
+				onComplete(newRotation);
 			}
 		};
 
 		requestAnimationFrame(animate);
 	}, [currentRotation]);
 
-	const spinWheel = useCallback(async () => {
+	// Removed snap-to-center animation - wheel stops at natural position
+
+	const spinWheel = useCallback(() => {
 		if (isSpinning || segments.length === 0) return;
 
 		try {
-			// Use the wheel manager to handle the spin logic
-			const result = await spin();
+			// Get spin parameters from wheel manager
+			const spinParams = startSpin();
+			
+			// Calculate the target rotation
+			const targetRotation = currentRotation + spinParams.totalRotation;
 
-			// Calculate the visual rotation for animation
-			const baseRotations = 5;
-			const extraRotations = Math.random() * 2;
-			const totalRotations = (baseRotations + extraRotations) * 360;
-			const finalRotation = currentRotation + totalRotations + result.finalAngle;
-
-			// Animate the wheel
-			animateWheel(finalRotation, () => {
-				// Use the result from the wheel manager
+			// Animate the wheel to the random stop position
+			animateWheel(targetRotation, (finalRotation: number) => {
+				// Calculate the winner based on where the wheel actually stopped
+				const result = calculateWinnerAtPosition(finalRotation, false);
+				
+				// Stop spinning and announce the winner immediately
+				stopSpin();
 				onSpinResult(result.winnerText);
 			});
 
 		} catch (error) {
 			console.error('Spin failed:', error);
+			stopSpin(); // Make sure to clear spinning state on error
 		}
-	}, [isSpinning, segments.length, spin, currentRotation, onSpinResult, animateWheel]);
+	}, [isSpinning, segments.length, startSpin, stopSpin, currentRotation, onSpinResult, animateWheel, calculateWinnerAtPosition]);
 
 	// Add keyboard shortcuts
 	useEffect(() => {
