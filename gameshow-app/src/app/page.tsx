@@ -1,14 +1,39 @@
 'use client';
 
 import { useGameState } from '@/hooks/useGameState';
+import { useAuth } from '@/hooks/useAuth';
 import GameTitle from '@/components/GameTitle';
 import NavigationCard from '@/components/common/NavigationCard';
 import QuickScoresPreview from '@/components/scoreboard/QuickScoresPreview';
 import QuickStartGuide from '@/components/QuickStartGuide';
+import LoginForm from '@/components/LoginForm';
 
 export default function Home() {
 	const { players } = useGameState();
+	const { isAuthenticated, isLoading, login, logout } = useAuth();
 
+	// Show loading state while checking authentication
+	if (isLoading) {
+		return (
+			<div className="game-container">
+				<div style={{ 
+					maxWidth: '400px', 
+					margin: '0 auto',
+					padding: '20px',
+					textAlign: 'center'
+				}}>
+					<p>Loading...</p>
+				</div>
+			</div>
+		);
+	}
+
+	// Show login form if not authenticated
+	if (!isAuthenticated) {
+		return <LoginForm onLogin={login} />;
+	}
+
+	// Show admin area if authenticated
 	return (
 		<div className="game-container">
 			<div style={{ 
@@ -17,6 +42,27 @@ export default function Home() {
 				padding: '20px',
 				textAlign: 'center'
 			}}>
+				{/* Logout Button */}
+				<div style={{ 
+					textAlign: 'right', 
+					marginBottom: '1rem' 
+				}}>
+					<button
+						onClick={logout}
+						style={{
+							backgroundColor: '#8B4513',
+							color: 'white',
+							padding: '0.5rem 1rem',
+							fontSize: '0.9rem',
+							border: 'none',
+							borderRadius: '6px',
+							cursor: 'pointer'
+						}}
+					>
+						🚪 Logout
+					</button>
+				</div>
+
 				{/* Main Title */}
 				<GameTitle />
 
