@@ -1,22 +1,171 @@
+/* Medieval Fantasy Game Show Styles */
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Crimson+Text:wght@400;600;700&family=MedievalSharp&display=swap');
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
+:root {
+  /* Medieval Fantasy Color Palette */
+  --primary-color: #8B4513;      /* Saddle Brown */
+  --secondary-color: #556B2F;    /* Dark Olive Green */
+  --accent-color: #DC143C;       /* Crimson */
+  --success-color: #6B8E23;      /* Olive Drab */
+  --warning-color: #DAA520;      /* Goldenrod */
+  --info-color: #4682B4;         /* Steel Blue */
+  --light-color: #F5F5DC;        /* Beige */
+  --dark-color: #2F4F4F;         /* Dark Slate Gray */
+  --gold-color: #FFD700;         /* Gold */
+  --silver-color: #C0C0C0;       /* Silver */
+  --bronze-color: #CD7F32;       /* Bronze */
+  
+  /* Additional Medieval Colors */
+  --tan-color: #D2B48C;          /* Tan */
+  --cream-color: #FFF8DC;        /* Cornsilk */
+  --forest-green: #228B22;       /* Forest Green */
+  --sage-green: #9CAF88;         /* Sage */
+  --deep-brown: #654321;         /* Dark Brown */
+  --warm-yellow: #F0E68C;        /* Khaki */
+  --muted-green: #8FBC8F;        /* Dark Sea Green */
+  
+  /* Medieval Gold and Brown Variables */
+  --medieval-gold: #DAA520;      /* Goldenrod */
+  --medieval-brown: #8B4513;     /* Saddle Brown */
+  --medieval-brown-dark: #654321; /* Dark Brown */
+}
+
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-  background-color: #1a1a2e;
-  color: white;
-  overflow: hidden;
+  font-family: 'Crimson Text', serif;
+  background: linear-gradient(135deg, #8B4513 0%, #556B2F 50%, #2F4F4F 100%);
+  color: var(--dark-color);
+  min-height: 100vh;
 }
 
 .game-container {
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+  font-family: 'Crimson Text', serif;
+  color: var(--dark-color);
+}
+
+/* Button Styling */
+.btn {
+  border-radius: 25px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  font-family: 'Cinzel', serif;
+  border: none;
+  cursor: pointer;
+  padding: 1rem 2rem;
+  font-size: 1.1rem;
+  min-width: 150px;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-primary {
+  background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+  color: white;
+}
+
+.btn-secondary {
+  background: linear-gradient(45deg, var(--accent-color), #B22222);
+  color: white;
+}
+
+/* User Directions Banner */
+.user-directions-banner {
+  background: linear-gradient(135deg, var(--cream-color) 0%, var(--tan-color) 100%);
+  border: 3px solid var(--deep-brown);
+  border-radius: 15px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+  position: relative;
+}
+
+.user-directions-banner h4 {
+  color: var(--deep-brown);
+  font-family: 'MedievalSharp', cursive;
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
   text-align: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.user-directions-banner p {
+  font-family: 'Crimson Text', serif;
+  color: var(--dark-color);
+  line-height: 1.6;
+  margin-bottom: 0.5rem;
+}
+
+.shortcut {
+  background: var(--warm-yellow);
+  padding: 0.2rem 0.5rem;
+  border-radius: 5px;
+  font-weight: bold;
+  color: var(--deep-brown);
+  border: 1px solid var(--deep-brown);
+}
+
+/* Animation Classes */
+.fade-in {
+  animation: fadeIn 0.5s ease-in;
+}
+
+.slide-up {
+  animation: slideUp 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* Result Text Blinking Effect */
+.result-text.blinking {
+  background: linear-gradient(135deg, #DAA520 0%, #B8860B 25%, #CD853F 50%, #D2691E 75%, #8B4513 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: richGradientBlink 0.8s ease-in-out infinite alternate;
+  text-shadow: none; /* Remove text shadow for gradient effect */
+}
+
+/* Rich gradient blinking animation */
+@keyframes richGradientBlink {
+  0% {
+    background: linear-gradient(135deg, #DAA520 0%, #B8860B 25%, #CD853F 50%, #D2691E 75%, #8B4513 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    opacity: 1;
+  }
+  100% {
+    background: linear-gradient(135deg, #DAA520 0%, #B8860B 25%, #CD853F 50%, #D2691E 75%, #8B4513 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    opacity: 0;
+  }
 }

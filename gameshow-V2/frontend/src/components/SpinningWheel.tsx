@@ -3,7 +3,9 @@
 import { useState, useRef, useEffect } from 'react';
 
 interface WheelSegment {
+  id: number;
   text: string;
+  action: string;
   color: string;
   angle: number;
 }
@@ -18,28 +20,45 @@ export default function SpinningWheel({ onSpinResult }: SpinningWheelProps) {
   const [currentRotation, setCurrentRotation] = useState(0);
   const [segments, setSegments] = useState<WheelSegment[]>([]);
 
-  // Default wheel segments (simplified from V1)
+  // Default wheel segments from V1
   const defaultSegments = [
-    'Lose a Turn',
-    'Bankrupt',
-    'Free Spin',
-    '+100',
-    '+200',
-    '+300',
-    '+500',
-    '+1000'
+    { id: 0, text: "New Rule", action: "new_rule", angle: 0 },
+    { id: 1, text: "New Rule", action: "new_rule", angle: 30 },
+    { id: 2, text: "New Rule", action: "new_rule", angle: 60 },
+    { id: 3, text: "Modify: Audience Choice", action: "audience_choice", angle: 90 },
+    { id: 4, text: "Modify: Audience Choice", action: "audience_choice", angle: 120 },
+    { id: 5, text: "Challenge", action: "challenge", angle: 150 },
+    { id: 6, text: "Challenge", action: "challenge", angle: 180 },
+    { id: 7, text: "Challenge", action: "challenge", angle: 210 },
+    { id: 8, text: "Modify: Duplicate", action: "duplicate", angle: 240 },
+    { id: 9, text: "Modify: Reverse", action: "reverse", angle: 270 },
+    { id: 10, text: "Modify: Swap", action: "swap", angle: 300 }
   ];
 
-  const colors = [
-    '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', 
-    '#FECA57', '#FF9FF3', '#54A0FF', '#5F27CD'
+  // Soft color palette for wheel segments
+  const softColors = [
+    '#F8F9FA',  // Very light white
+    '#F1F3F4',  // Light gray-white
+    '#F5F5DC',  // Light beige
+    '#F0E68C',  // Light khaki
+    '#F0F8FF',  // Light azure
+    '#F0FFF0',  // Light honeydew
+    '#F5FFFA',  // Light mint cream
+    '#FFF8DC',  // Light cornsilk
+    '#FDF5E6',  // Light old lace
+    '#F0F8FF',  // Light alice blue
+    '#F5F5F5'   // Light gray
   ];
+
+  const getRandomSoftColor = () => {
+    return softColors[Math.floor(Math.random() * softColors.length)];
+  };
 
   useEffect(() => {
-    // Initialize segments with colors
-    const wheelSegments = defaultSegments.map((text, index) => ({
-      text,
-      color: colors[index % colors.length],
+    // Initialize segments with randomized colors
+    const wheelSegments = defaultSegments.map((segment, index) => ({
+      ...segment,
+      color: getRandomSoftColor(),
       angle: (360 / defaultSegments.length) * index
     }));
     setSegments(wheelSegments);
@@ -60,10 +79,30 @@ export default function SpinningWheel({ onSpinResult }: SpinningWheelProps) {
 
     const centerX = canvas.width / 2;
     const centerY = canvas.height / 2;
-    const radius = Math.min(centerX, centerY) - 20;
+    const radius = Math.min(centerX, centerY) - 45;
 
     // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Draw the outer wooden ring first (water wheel frame)
+    const outerRadius = radius + 25;
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, outerRadius, 0, 2 * Math.PI);
+    ctx.fillStyle = '#8B4513'; // Saddle brown
+    ctx.fill();
+    
+    // Add wood grain texture to the outer ring
+    addWoodGrainTexture(ctx, centerX, centerY, outerRadius, 25);
+    
+    // Draw the inner wooden ring (inner frame)
+    const innerRadius = radius - 25;
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, innerRadius, 0, 2 * Math.PI);
+    ctx.fillStyle = '#8B4513';
+    ctx.fill();
+    
+    // Add wood grain texture to the inner ring
+    addWoodGrainTexture(ctx, centerX, centerY, innerRadius, 25);
 
     // Draw segments
     const segmentAngle = (2 * Math.PI) / segments.length;
@@ -78,16 +117,32 @@ export default function SpinningWheel({ onSpinResult }: SpinningWheelProps) {
       ctx.arc(centerX, centerY, radius, startAngle, endAngle);
       ctx.closePath();
       
-      // Fill segment
+      // Fill segment with soft color
       ctx.fillStyle = segment.color;
       ctx.fill();
       
-      // Draw border
-      ctx.strokeStyle = '#333';
-      ctx.lineWidth = 2;
+      // Draw wooden slat between segments (thick wooden divider)
+      const slatAngle = startAngle + segmentAngle;
+      const slatStartX = centerX + Math.cos(slatAngle) * (innerRadius + 5);
+      const slatStartY = centerY + Math.sin(slatAngle) * (innerRadius + 5);
+      const slatEndX = centerX + Math.cos(slatAngle) * (outerRadius - 5);
+      const slatEndY = centerY + Math.sin(slatAngle) * (outerRadius - 5);
+      
+      ctx.beginPath();
+      ctx.moveTo(slatStartX, slatStartY);
+      ctx.lineTo(slatEndX, slatEndY);
+      ctx.strokeStyle = '#A0522D'; // Sienna
+      ctx.lineWidth = 8;
+      ctx.lineCap = 'round';
       ctx.stroke();
       
-      // Draw text
+      // Add wood grain to the slat
+      addWoodGrainToSlat(ctx, slatStartX, slatStartY, slatEndX, slatEndY, 8);
+    });
+    
+    // Draw text on segments
+    segments.forEach((segment, index) => {
+      const startAngle = index * segmentAngle + (currentRotation * Math.PI / 180);
       const textAngle = startAngle + segmentAngle / 2;
       const textRadius = radius * 0.7;
       const textX = centerX + Math.cos(textAngle) * textRadius;
@@ -95,22 +150,109 @@ export default function SpinningWheel({ onSpinResult }: SpinningWheelProps) {
       
       ctx.save();
       ctx.translate(textX, textY);
+      // Rotate text to be vertical like a wheel spoke (from center to edge)
       ctx.rotate(textAngle);
       
-      ctx.fillStyle = '#fff';
-      ctx.font = 'bold 16px Arial';
+      // Enhanced text styling with bigger, bolder text
+      ctx.fillStyle = '#2C3E50'; // Dark blue-gray for better readability
+      ctx.font = 'bold 20px "Cinzel", serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText(segment.text, 0, 0);
+      
+      // Draw text with subtle shadow for depth
+      ctx.shadowColor = 'rgba(255, 255, 255, 0.8)';
+      ctx.shadowBlur = 2;
+      ctx.shadowOffsetX = 1;
+      ctx.shadowOffsetY = 1;
+      
+      // Handle long text by splitting into multiple lines
+      const words = segment.text.split(' ');
+      const lineHeight = 24;
+      
+      if (words.length > 2) {
+        // Split into multiple lines
+        let currentLine = '';
+        let lineCount = 0;
+        
+        for (let i = 0; i < words.length; i++) {
+          const testLine = currentLine + (currentLine ? ' ' : '') + words[i];
+          if (testLine.length > 8 && currentLine) {
+            // Draw current line
+            ctx.fillText(currentLine, 0, lineCount * lineHeight - (words.length - 1) * lineHeight / 2);
+            lineCount++;
+            currentLine = words[i];
+          } else {
+            currentLine = testLine;
+          }
+        }
+        // Draw last line
+        if (currentLine) {
+          ctx.fillText(currentLine, 0, lineCount * lineHeight - (words.length - 1) * lineHeight / 2);
+        }
+      } else {
+        ctx.fillText(segment.text, 0, 0);
+      }
       
       ctx.restore();
     });
-
-    // Draw center circle
+    
+    // Draw center circle with wooden styling
+    const centerRadius = 15;
     ctx.beginPath();
-    ctx.arc(centerX, centerY, 15, 0, 2 * Math.PI);
-    ctx.fillStyle = '#333';
+    ctx.arc(centerX, centerY, centerRadius, 0, 2 * Math.PI);
+    ctx.fillStyle = '#8B4513';
     ctx.fill();
+    ctx.strokeStyle = 'rgba(0, 0, 0, 0.3)';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+    
+    // Add wood grain to center circle
+    addWoodGrainTexture(ctx, centerX, centerY, centerRadius, centerRadius);
+  };
+
+  // Function to add wood grain texture to circular elements
+  const addWoodGrainTexture = (ctx: CanvasRenderingContext2D, centerX: number, centerY: number, radius: number, width: number) => {
+    // Create subtle wood grain effect with darker lines
+    for (let i = 0; i < 8; i++) {
+      const angle = (i * Math.PI) / 4;
+      const startX = centerX + Math.cos(angle) * (radius - width / 2);
+      const startY = centerY + Math.sin(angle) * (radius - width / 2);
+      const endX = centerX + Math.cos(angle) * (radius + width / 2);
+      const endY = centerY + Math.sin(angle) * (radius + width / 2);
+      
+      ctx.beginPath();
+      ctx.moveTo(startX, startY);
+      ctx.lineTo(endX, endY);
+      ctx.strokeStyle = 'rgba(0, 0, 0, 0.2)';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    }
+  };
+
+  // Function to add wood grain to slats
+  const addWoodGrainToSlat = (ctx: CanvasRenderingContext2D, startX: number, startY: number, endX: number, endY: number, width: number) => {
+    // Create wood grain lines along the slat
+    const length = Math.sqrt(Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2));
+    const segments = Math.floor(length / 10);
+    
+    for (let i = 0; i < segments; i++) {
+      const progress = i / segments;
+      const x = startX + (endX - startX) * progress;
+      const y = startY + (endY - startY) * progress;
+      
+      // Perpendicular line for wood grain
+      const perpX = x + Math.cos(Math.atan2(endY - startY, endX - startX) + Math.PI / 2) * (width / 2);
+      const perpY = y + Math.sin(Math.atan2(endY - startY, endX - startX) + Math.PI / 2) * (width / 2);
+      const perpEndX = x + Math.cos(Math.atan2(endY - startY, endX - startX) + Math.PI / 2) * (-width / 2);
+      const perpEndY = y + Math.sin(Math.atan2(endY - startY, endX - startX) + Math.PI / 2) * (-width / 2);
+      
+      ctx.beginPath();
+      ctx.moveTo(perpX, perpY);
+      ctx.lineTo(perpEndX, perpEndY);
+      ctx.strokeStyle = 'rgba(0, 0, 0, 0.15)';
+      ctx.lineWidth = 0.5;
+      ctx.stroke();
+    }
   };
 
   const spinWheel = async () => {
@@ -119,23 +261,42 @@ export default function SpinningWheel({ onSpinResult }: SpinningWheelProps) {
     setIsSpinning(true);
     
     try {
-      // Simple local spin (will connect to backend later)
-      const spins = 5 + Math.random() * 3; // 5-8 full rotations
-      const finalAngle = Math.random() * 360;
-      const totalRotation = currentRotation + (spins * 360) + finalAngle;
+      // Simple, predictable spin force like V1
+      const baseRotations = 5; // Always spin about 5 full rotations
+      const extraRotations = Math.random() * 2; // Add 0-2 extra rotations for variety
+      
+      // Calculate the target segment (random selection)
+      const targetSegmentIndex = Math.floor(Math.random() * segments.length);
+      const segmentAngle = 360 / segments.length;
+      const targetAngle = targetSegmentIndex * segmentAngle;
+      
+      // Calculate how many full rotations we want
+      const totalRotations = (baseRotations + extraRotations) * 360;
+      
+      // Add a small offset to ensure pointer lands clearly in the target segment
+      const offset = (Math.random() * 0.5 + 0.25) * segmentAngle; // 0.25 to 0.75 of segment
+      
+      // Calculate the final target rotation
+      const finalRotation = currentRotation + totalRotations + targetAngle + offset;
       
       // Animate the spin
-      animateWheel(totalRotation, () => {
+      animateWheel(finalRotation, () => {
         setIsSpinning(false);
         
-        // Calculate which segment won
+        // Calculate which segment won based on the final rotation
         const segmentAngle = 360 / segments.length;
-        const normalizedAngle = (360 - (totalRotation % 360)) % 360;
-        const segmentIndex = Math.floor(normalizedAngle / segmentAngle);
-        const winner = segments[segmentIndex];
+        const normalizedRotation = (currentRotation % 360 + 360) % 360;
         
-        if (winner) {
-          onSpinResult(winner.text);
+        // The leaf icon points to the right (3 o'clock position)
+        const rightPosition = 0;
+        let adjustedRotation = (rightPosition - normalizedRotation * Math.PI / 180) % (2 * Math.PI);
+        if (adjustedRotation < 0) adjustedRotation += 2 * Math.PI;
+        
+        const segmentIndex = Math.floor(adjustedRotation / (segmentAngle * Math.PI / 180)) % segments.length;
+        const selectedSegment = segments[segmentIndex];
+        
+        if (selectedSegment) {
+          onSpinResult(selectedSegment.text.toUpperCase());
         }
       });
       
@@ -154,10 +315,11 @@ export default function SpinningWheel({ onSpinResult }: SpinningWheelProps) {
       const elapsed = currentTime - startTime;
       const progress = Math.min(elapsed / duration, 1);
       
-      // Ease out animation
-      const easeValue = 1 - Math.pow(1 - progress, 3);
-      const newRotation = startRotation + (targetRotation - startRotation) * easeValue;
+      // Simple, natural wheel physics: starts fast, slows down naturally
+      const easeValue = 1 - Math.pow(1 - progress, 2); // Quadratic ease-out
       
+      // Calculate rotation
+      const newRotation = startRotation + (targetRotation - startRotation) * easeValue;
       setCurrentRotation(newRotation);
       
       if (progress < 1) {
@@ -170,52 +332,65 @@ export default function SpinningWheel({ onSpinResult }: SpinningWheelProps) {
     requestAnimationFrame(animate);
   };
 
+  // Add keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === ' ' || event.key === 'Enter') {
+        event.preventDefault();
+        if (!isSpinning) {
+          spinWheel();
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isSpinning]);
+
   return (
     <div style={{ textAlign: 'center' }}>
-      <div style={{ position: 'relative', display: 'inline-block' }}>
+      <div style={{ position: 'relative', display: 'inline-block', margin: '1.5rem 0' }}>
         <canvas
           ref={canvasRef}
-          width={400}
-          height={400}
+          width={600}
+          height={600}
           style={{
-            border: '3px solid #333',
             borderRadius: '50%',
-            boxShadow: '0 8px 16px rgba(0,0,0,0.3)'
+            boxShadow: '0 15px 35px rgba(0, 0, 0, 0.5)',
+            border: '5px solid var(--deep-brown)',
+            maxWidth: '100%',
+            height: 'auto'
           }}
         />
-        {/* Pointer */}
+        {/* Leaf Pointer */}
         <div
           style={{
             position: 'absolute',
             top: '50%',
             right: '-15px',
             transform: 'translateY(-50%)',
-            fontSize: '2rem',
-            color: '#ff6b6b',
-            zIndex: 10
+            zIndex: 10,
+            fontSize: '2.5rem',
+            color: '#228B22', // Deep green
+            filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5))'
           }}
         >
-          ▶
+          🌱
         </div>
       </div>
       
-      <div style={{ marginTop: '2rem' }}>
+      <div style={{ marginTop: '1.5rem' }}>
         <button
           onClick={spinWheel}
           disabled={isSpinning}
+          className={`btn btn-primary ${isSpinning ? '' : ''}`}
           style={{
-            padding: '1rem 2rem',
-            fontSize: '1.2rem',
-            fontWeight: 'bold',
-            backgroundColor: isSpinning ? '#666' : '#4ECDC4',
-            color: 'white',
-            border: 'none',
-            borderRadius: '8px',
-            cursor: isSpinning ? 'not-allowed' : 'pointer',
-            transition: 'all 0.3s ease'
+            opacity: isSpinning ? 0.6 : 1,
+            cursor: isSpinning ? 'not-allowed' : 'pointer'
           }}
         >
-          {isSpinning ? 'Spinning...' : '🎯 SPIN THE WHEEL!'}
+          <span style={{ marginRight: '0.5rem' }}>▶️</span>
+          {isSpinning ? 'Spinning...' : 'SPIN THE WHEEL!'}
         </button>
       </div>
     </div>
