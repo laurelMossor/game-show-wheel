@@ -123,6 +123,23 @@ body {
   border: 1px solid var(--deep-brown);
 }
 
+/* Score Card Styling */
+.player-score-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  border-color: var(--gold-color);
+}
+
+/* Score Update Animation */
+.score-update {
+  animation: scoreUpdatePulse 0.6s ease-in-out;
+}
+
+@keyframes scoreUpdatePulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
 /* Animation Classes */
 .fade-in {
   animation: fadeIn 0.5s ease-in;

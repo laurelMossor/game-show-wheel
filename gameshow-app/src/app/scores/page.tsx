@@ -73,18 +73,14 @@ export default function ScoresPage() {
 
         {/* Score Board */}
         <div style={{ 
-          display: 'flex',
           justifyContent: 'center',
           marginBottom: '2rem'
         }}>
           <div style={{
-            background: 'linear-gradient(135deg, var(--cream-color) 0%, var(--light-color) 100%)',
-            padding: '2rem',
-            borderRadius: '20px',
-            border: '3px solid var(--deep-brown)',
-            boxShadow: '0 8px 25px rgba(0, 0, 0, 0.3)',
-            width: '100%',
-            maxWidth: '900px'
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+            gap: '2rem',
+            marginBottom: '2rem'
           }}>
             <ScoreBoard 
               players={players}
@@ -147,23 +143,133 @@ export default function ScoresPage() {
           </a>
         </div>
 
-        {/* Instructions */}
-        <div className="user-directions-banner">
-          <h4>
-            <span style={{ marginRight: '0.5rem' }}>ℹ️</span>
-            How to Play
-          </h4>
-          <p>
-            <strong>Score Management:</strong> Click on player names to edit them, use +/- buttons to adjust scores
-          </p>
-          <p>
-            <strong>Navigation:</strong> Use{' '}
-            <span className="shortcut">F1</span> for Scores,{' '}
-            <span className="shortcut">F2</span> for Wheel
-          </p>
-          <p>
-            <strong>Game Flow:</strong> Start the game, spin the wheel, and track player scores throughout the game
-          </p>
+        {/* User Directions Banner */}
+        <div style={{
+          background: 'linear-gradient(135deg, var(--cream-color) 0%, var(--tan-color) 100%)',
+          border: '3px solid var(--deep-brown)',
+          borderRadius: '15px',
+          padding: '1.5rem',
+          marginBottom: '2rem',
+          boxShadow: '0 8px 25px rgba(0, 0, 0, 0.3)',
+          position: 'relative'
+        }}>
+          <div style={{
+            position: 'absolute',
+            top: '-10px',
+            left: '20px',
+            width: '20px',
+            height: '20px',
+            background: 'var(--deep-brown)',
+            transform: 'rotate(45deg)',
+            zIndex: -1
+          }} />
+          
+          <h3 style={{
+            color: 'var(--deep-brown)',
+            fontFamily: "'MedievalSharp', cursive",
+            fontSize: '1.5rem',
+            marginBottom: '1rem',
+            textAlign: 'center',
+            textShadow: '1px 1px 2px rgba(0, 0, 0, 0.2)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '0.5rem'
+          }}>
+            <span style={{ fontSize: '1.8rem' }}>ℹ️</span>
+            How to Use the Scoreboard
+          </h3>
+          
+          <div style={{
+            fontFamily: "'Crimson Text', serif",
+            color: 'var(--dark-color)',
+            lineHeight: 1.6
+          }}>
+            <p style={{ marginBottom: '0.5rem' }}>
+              <strong>Edit Names:</strong> Click on any player name to edit, press{' '}
+              <span style={{
+                background: 'var(--warm-yellow)',
+                padding: '0.2rem 0.5rem',
+                borderRadius: '5px',
+                fontWeight: 'bold',
+                color: 'var(--deep-brown)',
+                border: '1px solid var(--deep-brown)',
+                fontFamily: 'monospace'
+              }}>Enter</span> to save or{' '}
+              <span style={{
+                background: 'var(--warm-yellow)',
+                padding: '0.2rem 0.5rem',
+                borderRadius: '5px',
+                fontWeight: 'bold',
+                color: 'var(--deep-brown)',
+                border: '1px solid var(--deep-brown)',
+                fontFamily: 'monospace'
+              }}>Escape</span> to cancel
+            </p>
+            <p style={{ marginBottom: '0.5rem' }}>
+              <strong>Update Favor:</strong> Click on favor value to type directly, or use the up/down arrows in the input field
+            </p>
+            <p style={{ marginBottom: '0.5rem' }}>
+              <strong>Navigation:</strong> Use{' '}
+              <span style={{
+                background: 'var(--warm-yellow)',
+                padding: '0.2rem 0.5rem',
+                borderRadius: '5px',
+                fontWeight: 'bold',
+                color: 'var(--deep-brown)',
+                border: '1px solid var(--deep-brown)',
+                fontFamily: 'monospace'
+              }}>F1</span> for Scores,{' '}
+              <span style={{
+                background: 'var(--warm-yellow)',
+                padding: '0.2rem 0.5rem',
+                borderRadius: '5px',
+                fontWeight: 'bold',
+                color: 'var(--deep-brown)',
+                border: '1px solid var(--deep-brown)',
+                fontFamily: 'monospace'
+              }}>F2</span> for Wheel
+            </p>
+            
+            <div style={{
+              borderTop: '1px solid var(--deep-brown)',
+              paddingTop: '1rem',
+              marginTop: '1rem',
+              textAlign: 'center'
+            }}>
+              <button 
+                type="button" 
+                className="btn btn-outline-secondary btn-sm"
+                style={{
+                  borderColor: 'var(--deep-brown)',
+                  color: 'var(--deep-brown)',
+                  transition: 'all 0.3s ease',
+                  background: 'transparent'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'rgba(101, 67, 33, 0.1)';
+                  e.currentTarget.style.borderColor = 'var(--medieval-gold)';
+                  e.currentTarget.style.color = 'var(--medieval-gold)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'transparent';
+                  e.currentTarget.style.borderColor = 'var(--deep-brown)';
+                  e.currentTarget.style.color = 'var(--deep-brown)';
+                }}
+                onClick={() => window.location.reload()}
+              >
+                <span style={{ fontSize: '1rem', marginRight: '0.5rem' }}>🔄</span>
+                Refresh Scores
+              </button>
+              <small style={{ 
+                color: 'var(--secondary-color)', 
+                marginLeft: '0.5rem',
+                fontSize: '0.85rem'
+              }}>
+                Click to sync with server (preserves local changes)
+              </small>
+            </div>
+          </div>
         </div>
       </div>
     </div>

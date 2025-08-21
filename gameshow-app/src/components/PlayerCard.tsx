@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Player } from '@/types/game';
 
 interface PlayerCardProps {
@@ -12,6 +12,18 @@ interface PlayerCardProps {
 export default function PlayerCard({ player, onUpdateScore, onUpdatePlayerName }: PlayerCardProps) {
   const [isEditingName, setIsEditingName] = useState(false);
   const [editName, setEditName] = useState(player.name);
+  const [isEditingScore, setIsEditingScore] = useState(false);
+  const [editScore, setEditScore] = useState(player.score.toString());
+
+  // Sync editScore with player.score changes
+  useEffect(() => {
+    setEditScore(player.score.toString());
+  }, [player.score]);
+
+  // Sync editName with player.name changes
+  useEffect(() => {
+    setEditName(player.name);
+  }, [player.name]);
 
   const handleNameSubmit = () => {
     if (onUpdatePlayerName && editName.trim()) {
@@ -29,127 +41,178 @@ export default function PlayerCard({ player, onUpdateScore, onUpdatePlayerName }
     }
   };
 
-  return (
-    <div style={{
-      background: 'linear-gradient(135deg, var(--cream-color) 0%, var(--light-color) 100%)',
-      border: '3px solid var(--deep-brown)',
-      borderRadius: '20px',
-      padding: '2rem',
-      minWidth: '250px',
-      boxShadow: '0 8px 25px rgba(0, 0, 0, 0.3)',
-      textAlign: 'center',
-      transition: 'all 0.3s ease'
-    }}>
-      {/* Player Name */}
-      {isEditingName ? (
-        <input
-          type="text"
-          value={editName}
-          onChange={(e) => setEditName(e.target.value)}
-          onBlur={handleNameSubmit}
-          onKeyDown={handleNameKeyPress}
-          autoFocus
-          style={{
-            fontFamily: "'Cinzel', serif",
-            fontSize: '1.5rem',
-            fontWeight: 'bold',
-            color: 'var(--deep-brown)',
-            background: 'transparent',
-            border: '2px solid var(--secondary-color)',
-            borderRadius: '8px',
-            padding: '0.5rem',
-            textAlign: 'center',
-            marginBottom: '1rem',
-            width: '100%'
-          }}
-        />
-      ) : (
-        <h2 
-          style={{
-            fontFamily: "'Cinzel', serif",
-            fontSize: '1.5rem',
-            fontWeight: 'bold',
-            color: 'var(--deep-brown)',
-            marginBottom: '1rem',
-            cursor: onUpdatePlayerName ? 'pointer' : 'default',
-            textTransform: 'uppercase',
-            letterSpacing: '1px'
-          }}
-          onClick={() => onUpdatePlayerName && setIsEditingName(true)}
-          title={onUpdatePlayerName ? 'Click to edit name' : ''}
-        >
-          {player.name}
-        </h2>
-      )}
+  const handleScoreSubmit = () => {
+    const newScore = parseInt(editScore);
+    if (!isNaN(newScore)) {
+      const scoreDiff = newScore - player.score;
+      onUpdateScore(scoreDiff);
+    }
+    setIsEditingScore(false);
+  };
 
-      {/* Score Display */}
-      <div style={{
-        fontFamily: "'MedievalSharp', cursive",
-        fontSize: '3.5rem',
-        fontWeight: 'bold',
-        color: 'var(--medieval-gold)',
-        textShadow: '2px 2px 0px var(--medieval-brown-dark), 4px 4px 8px rgba(0, 0, 0, 0.5)',
-        margin: '1.5rem 0',
-        letterSpacing: '2px'
-      }}>
-        {player.score}
+  const handleScoreKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleScoreSubmit();
+    } else if (e.key === 'Escape') {
+      setEditScore(player.score.toString());
+      setIsEditingScore(false);
+    }
+  };
+
+  return (
+    <div>
+      {/* Player Header */}
+      <div style={{ marginBottom: '1.5rem', position: 'relative' }}>
+        <div style={{ marginBottom: '0.5rem' }}>
+          {/* Player Name */}
+          {isEditingName ? (
+            <input
+              type="text"
+              value={editName}
+              onChange={(e) => setEditName(e.target.value)}
+              onBlur={handleNameSubmit}
+              onKeyDown={handleNameKeyPress}
+              autoFocus
+              style={{
+                background: 'rgba(255, 255, 255, 0.5)',
+                border: '2px solid var(--gold-color)',
+                borderRadius: '10px',
+                padding: '0.5rem 1rem',
+                fontSize: '1.5rem',
+                fontWeight: 'bold',
+                color: 'var(--deep-brown)',
+                textTransform: 'uppercase',
+                letterSpacing: '1px',
+                fontFamily: "'MedievalSharp', cursive",
+                textAlign: 'center',
+                width: '100%',
+                transition: 'all 0.3s ease',
+                cursor: 'text',
+                boxShadow: '0 0 15px rgba(218, 165, 32, 0.3)'
+              }}
+            />
+          ) : (
+            <input
+              type="text"
+              value={player.name}
+              readOnly
+              onClick={() => onUpdatePlayerName && setIsEditingName(true)}
+              style={{
+                background: 'transparent',
+                border: '2px solid transparent',
+                borderRadius: '10px',
+                padding: '0.5rem 1rem',
+                fontSize: '1.5rem',
+                fontWeight: 'bold',
+                color: 'var(--deep-brown)',
+                textTransform: 'uppercase',
+                letterSpacing: '1px',
+                fontFamily: "'MedievalSharp', cursive",
+                textAlign: 'center',
+                width: '100%',
+                transition: 'all 0.3s ease',
+                cursor: onUpdatePlayerName ? 'pointer' : 'default'
+              }}
+              onMouseEnter={(e) => {
+                if (onUpdatePlayerName) {
+                  e.currentTarget.style.borderColor = 'var(--deep-brown)';
+                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.3)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (onUpdatePlayerName) {
+                  e.currentTarget.style.borderColor = 'transparent';
+                  e.currentTarget.style.background = 'transparent';
+                }
+              }}
+              title={onUpdatePlayerName ? 'Click to edit name' : ''}
+            />
+          )}
+        </div>
       </div>
 
-      {/* Score Controls */}
-      <div style={{ 
-        display: 'grid',
-        gridTemplateColumns: 'repeat(2, 1fr)',
-        gap: '0.5rem',
-        marginTop: '1.5rem'
+      {/* Favor Display */}
+      <div style={{
+        marginBottom: '2rem',
+        padding: '1.5rem',
+        background: 'linear-gradient(135deg, var(--light-color) 0%, var(--cream-color) 100%)',
+        borderRadius: '15px',
+        border: '2px solid var(--tan-color)'
       }}>
-        <button 
-          className="btn"
-          style={{
-            background: 'linear-gradient(45deg, var(--accent-color), #B22222)',
-            color: 'white',
-            fontSize: '1rem',
-            padding: '0.75rem 1rem'
-          }}
-          onClick={() => onUpdateScore(-10)}
-        >
-          -10
-        </button>
-        <button 
-          className="btn"
-          style={{
-            background: 'linear-gradient(45deg, var(--warning-color), var(--gold-color))',
-            color: 'var(--deep-brown)',
-            fontSize: '1rem',
-            padding: '0.75rem 1rem'
-          }}
-          onClick={() => onUpdateScore(-1)}
-        >
-          -1
-        </button>
-        <button 
-          className="btn"
-          style={{
-            background: 'linear-gradient(45deg, var(--success-color), var(--forest-green))',
-            color: 'white',
-            fontSize: '1rem',
-            padding: '0.75rem 1rem'
-          }}
-          onClick={() => onUpdateScore(1)}
-        >
-          +1
-        </button>
-        <button 
-          className="btn"
-          style={{
-            background: 'linear-gradient(45deg, var(--info-color), var(--sage-green))',
-            color: 'white',
-            fontSize: '1rem',
-            padding: '0.75rem 1rem'
-          }}
-          onClick={() => onUpdateScore(10)}
-        >
-          +10
-        </button>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          marginBottom: '0.5rem'
+        }}>
+          {isEditingScore ? (
+            <input
+              type="number"
+              value={editScore}
+              onChange={(e) => setEditScore(e.target.value)}
+              onBlur={handleScoreSubmit}
+              onKeyDown={handleScoreKeyPress}
+              autoFocus
+              style={{
+                background: 'rgba(255, 255, 255, 0.5)',
+                border: '2px solid var(--gold-color)',
+                borderRadius: '10px',
+                padding: '0.5rem 1rem',
+                fontSize: '3rem',
+                fontWeight: 'bold',
+                color: 'var(--deep-brown)',
+                textShadow: '2px 2px 4px rgba(0, 0, 0, 0.2)',
+                fontFamily: "'Cinzel', serif",
+                textAlign: 'center',
+                width: '140px',
+                transition: 'all 0.3s ease',
+                boxShadow: '0 0 15px rgba(218, 165, 32, 0.3)'
+              }}
+            />
+          ) : (
+            <input
+              type="number"
+              value={player.score}
+              readOnly
+              onClick={() => setIsEditingScore(true)}
+              style={{
+                background: 'transparent',
+                border: '2px solid transparent',
+                borderRadius: '10px',
+                padding: '0.5rem 1rem',
+                fontSize: '3rem',
+                fontWeight: 'bold',
+                color: 'var(--deep-brown)',
+                textShadow: '2px 2px 4px rgba(0, 0, 0, 0.2)',
+                fontFamily: "'Cinzel', serif",
+                textAlign: 'center',
+                width: '140px',
+                transition: 'all 0.3s ease',
+                cursor: 'pointer'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = 'var(--deep-brown)';
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.3)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = 'transparent';
+                e.currentTarget.style.background = 'transparent';
+              }}
+              title="Click to edit score"
+            />
+          )}
+        </div>
+        <span style={{
+          display: 'block',
+          fontSize: '0.9rem',
+          color: 'var(--secondary-color)',
+          textTransform: 'uppercase',
+          letterSpacing: '2px',
+          fontWeight: 600,
+          fontFamily: "'Crimson Text', serif"
+        }}>
+          FAVOR
+        </span>
       </div>
     </div>
   );
