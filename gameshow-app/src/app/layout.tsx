@@ -1,18 +1,18 @@
 import './globals.css'
 
 export const metadata = {
-  title: 'Game Show V2',
-  description: 'Interactive game show with spinning wheel',
+    title: 'Game Show V2',
+    description: 'Interactive game show with spinning wheel',
 }
 
 export default function RootLayout({
-  children,
+    children,
 }: {
-  children: React.ReactNode
+    children: React.ReactNode
 }) {
-  return (
-    <html lang="en">
-      <body>{children}</body>
-    </html>
-  )
+    return (
+        <html lang="en">
+            <body>{children}</body>
+        </html>
+    )
 }
