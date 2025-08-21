@@ -41,11 +41,11 @@ export default function ScoreBoard({ players, onUpdateScore, onUpdatePlayerName 
                         right: 0,
                         height: '4px',
                         background: index === 0 ? 'var(--gold-color)' : 
-                                            index === 1 ? 'var(--silver-color)' : 
-                                            index === 2 ? 'var(--bronze-color)' : 
-                                            'linear-gradient(90deg, var(--gold-color), var(--silver-color), var(--bronze-color))'
+                            index === 1 ? 'var(--silver-color)' : 
+                            index === 2 ? 'var(--bronze-color)' : 
+                            'linear-gradient(90deg, var(--gold-color), var(--silver-color), var(--bronze-color))'
                     }} />
-
+                    
                     <PlayerCard 
                         player={player}
                         onUpdateScore={(points: number) => onUpdateScore({ playerId: player.id, points })}
