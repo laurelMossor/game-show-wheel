@@ -28,13 +28,3 @@ npm install
 npm run dev
 # Open http://localhost:3000
 ```
-
-## Future Development
-
-### Potential Enhancements
-- **Enhanced Animations**: Add Framer Motion for smoother effects
-- **Custom Themes**: Additional visual themes beyond medieval
-- **Sound Effects**: Audio feedback for spins and score changes
-- **Network Play**: Multi-device support for larger groups
-- **Tournament Mode**: Bracket-style competition support
-
