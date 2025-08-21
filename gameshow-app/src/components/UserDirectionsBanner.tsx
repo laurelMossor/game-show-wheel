@@ -1,8 +1,8 @@
 'use client';
 
-import GradientCard from './GradientCard';
-import KeyboardShortcut from './KeyboardShortcut';
-import IconButton from './IconButton';
+import GradientCard from './common/GradientCard';
+import KeyboardShortcut from './common/KeyboardShortcut';
+import IconButton from './common/IconButton';
 
 interface Instruction {
 	label: string;

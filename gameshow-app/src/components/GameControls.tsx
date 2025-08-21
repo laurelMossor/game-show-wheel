@@ -1,6 +1,6 @@
 'use client';
 
-import IconButton from './IconButton';
+import IconButton from './common/IconButton';
 
 interface GameControlsProps {
 	gameStarted: boolean;

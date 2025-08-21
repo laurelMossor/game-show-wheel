@@ -8,10 +8,31 @@ import { GameState, ScoreUpdate } from '@/types/game';
 import { gameState } from '@/lib/gameState';
 
 export function useGameState() {
-	const [state, setState] = useState<GameState>(gameState.getState());
+	const [state, setState] = useState<GameState>(() => {
+		// Initialize with default state to prevent hydration mismatch
+		return {
+			players: [
+				{ id: 'player1', name: 'Player 1', score: 0 },
+				{ id: 'player2', name: 'Player 2', score: 0 },
+				{ id: 'player3', name: 'Player 3', score: 0 },
+			],
+			// HEY where did rounds come from? 
+			currentRound: 1,
+			gameStarted: false,
+		};
+	});
+	const [mounted, setMounted] = useState(false);
+
+	// Load actual state after hydration to prevent mismatch
+	useEffect(() => {
+		setMounted(true);
+		setState(gameState.getState());
+	}, []);
 
 	// Sync with localStorage changes
 	useEffect(() => {
+		if (!mounted) return;
+
 		const syncState = () => {
 			setState(gameState.getState());
 		};
@@ -22,7 +43,7 @@ export function useGameState() {
 		return () => {
 			window.removeEventListener('storage', syncState);
 		};
-	}, []);
+	}, [mounted]);
 
 	const updateScore = useCallback((update: ScoreUpdate) => {
 		const success = gameState.updateScore(update);

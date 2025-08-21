@@ -1,11 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import SpinningWheel from '../../components/SpinningWheel';
+import SpinningWheel from '../../components/wheel/SpinningWheel';
 import SpinResultBanner from '../../components/SpinResultBanner';
-import WheelContainer from '../../components/WheelContainer';
+import WheelContainer from '../../components/wheel/WheelContainer';
 import UserDirectionsBanner from '../../components/UserDirectionsBanner';
-import IconButton from '../../components/IconButton';
 
 export default function WheelPage() {
 	const [result, setResult] = useState<string>('');

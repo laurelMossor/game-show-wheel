@@ -1,9 +1,9 @@
 'use client';
 
 import { useGameState } from '@/hooks/useGameState';
-import PageHeader from '@/components/PageHeader';
+import PageHeader from '@/components/common/PageHeader';
 import GameStatusBanner from '@/components/GameStatusBanner';
-import ScoreBoard from '@/components/ScoreBoard';
+import ScoreBoard from '@/components/scoreboard/ScoreBoard';
 import GameControls from '@/components/GameControls';
 import UserDirectionsBanner from '@/components/UserDirectionsBanner';
 

@@ -1,6 +1,6 @@
 'use client';
 
-import GradientCard from './GradientCard';
+import GradientCard from '../common/GradientCard';
 
 interface WheelContainerProps {
 	children: React.ReactNode;

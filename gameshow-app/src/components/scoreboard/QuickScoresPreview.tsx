@@ -1,7 +1,7 @@
 'use client';
 
 import { Player } from '@/types/game';
-import GradientCard from './GradientCard';
+import GradientCard from '../common/GradientCard';
 
 interface QuickScoresPreviewProps {
 	players: Player[];

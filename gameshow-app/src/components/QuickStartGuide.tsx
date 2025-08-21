@@ -1,6 +1,6 @@
 'use client';
 
-import KeyboardShortcut from './KeyboardShortcut';
+import KeyboardShortcut from './common/KeyboardShortcut';
 
 interface GuideSection {
 	title: string;

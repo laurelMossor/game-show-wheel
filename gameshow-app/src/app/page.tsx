@@ -3,8 +3,8 @@
 import { useGameState } from '@/hooks/useGameState';
 import GameTitle from '@/components/GameTitle';
 import GameStatusBanner from '@/components/GameStatusBanner';
-import NavigationCard from '@/components/NavigationCard';
-import QuickScoresPreview from '@/components/QuickScoresPreview';
+import NavigationCard from '@/components/common/NavigationCard';
+import QuickScoresPreview from '@/components/scoreboard/QuickScoresPreview';
 import QuickStartGuide from '@/components/QuickStartGuide';
 
 export default function Home() {
