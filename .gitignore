@@ -9,7 +9,8 @@ __pycache__/
 *.pyzw
 *.pyzwz
 *.pyzwzw
-**/node_modules/*
+**/node_modules/
+node_modules/
 **/dist/
 **/build/
 **/out/
