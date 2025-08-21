@@ -2,14 +2,12 @@
 
 import { useGameState } from '@/hooks/useGameState';
 import GameTitle from '@/components/GameTitle';
-import GameStatusBanner from '@/components/GameStatusBanner';
 import NavigationCard from '@/components/common/NavigationCard';
 import QuickScoresPreview from '@/components/scoreboard/QuickScoresPreview';
 import QuickStartGuide from '@/components/QuickStartGuide';
 
 export default function Home() {
-	const { players, getWinner } = useGameState();
-	const winner = getWinner();
+	const { players } = useGameState();
 
 	return (
 		<div className="game-container">
@@ -21,9 +19,6 @@ export default function Home() {
 			}}>
 				{/* Main Title */}
 				<GameTitle />
-
-				{/* Quick Status */}
-				<GameStatusBanner winner={winner} />
 
 				{/* Navigation Cards */}
 				<div style={{ 

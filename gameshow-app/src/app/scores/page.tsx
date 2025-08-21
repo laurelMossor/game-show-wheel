@@ -2,7 +2,6 @@
 
 import { useGameState } from '@/hooks/useGameState';
 import PageHeader from '@/components/common/PageHeader';
-import GameStatusBanner from '@/components/GameStatusBanner';
 import ScoreBoard from '@/components/scoreboard/ScoreBoard';
 import GameControls from '@/components/GameControls';
 import UserDirectionsBanner from '@/components/UserDirectionsBanner';
@@ -10,16 +9,10 @@ import UserDirectionsBanner from '@/components/UserDirectionsBanner';
 export default function ScoresPage() {
 	const { 
 		players, 
-		gameStarted, 
 		updateScore, 
 		updatePlayerName, 
-		resetScores,
-		resetGame,
-		startGame,
-		getWinner
+		resetScores
 	} = useGameState();
-
-	const winner = getWinner();
 
 	return (
 		<div className="game-container">
@@ -31,35 +24,17 @@ export default function ScoresPage() {
 				{/* Header */}
 				<PageHeader
 					title="🏆 GAME SHOW SCORES 🏆"
-					statusBanner={<GameStatusBanner winner={winner} />}
 				/>
 
 				{/* Score Board */}
-				<div style={{ 
-					justifyContent: 'center',
-					marginBottom: '2rem'
-				}}>
-					<div style={{
-						display: 'grid',
-						gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-						gap: '2rem',
-						marginBottom: '2rem'
-					}}>
-						<ScoreBoard 
-							players={players}
-							onUpdateScore={updateScore}
-							onUpdatePlayerName={updatePlayerName}
-						/>
-					</div>
-				</div>
+				<ScoreBoard 
+					players={players}
+					onUpdateScore={updateScore}
+					onUpdatePlayerName={updatePlayerName}
+				/>
 
 				{/* Controls */}
-				<GameControls
-					gameStarted={gameStarted}
-					onStartGame={startGame}
-					onResetScores={resetScores}
-					onResetGame={resetGame}
-				/>
+				<GameControls />
 
 				{/* User Directions Banner */}
 				<UserDirectionsBanner
@@ -82,11 +57,11 @@ export default function ScoresPage() {
 					]}
 					actions={[
 						{
-							text: "Refresh Scores",
-							onClick: () => window.location.reload(),
-							variant: "outline-secondary",
+							text: "Reset Scores",
+							onClick: resetScores,
+							variant: "warning",
 							icon: "🔄",
-							subtext: "Click to sync with server (preserves local changes)"
+							subtext: "Reset all player scores to 100"
 						}
 					]}
 				/>

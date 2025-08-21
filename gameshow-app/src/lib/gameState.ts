@@ -7,9 +7,9 @@ import { Player, GameState, ScoreUpdate } from '@/types/game';
 
 const STORAGE_KEY = 'gameshow-state';
 const DEFAULT_PLAYERS: Player[] = [
-	{ id: 'player1', name: 'Player 1', score: 0 },
-	{ id: 'player2', name: 'Player 2', score: 0 },
-	{ id: 'player3', name: 'Player 3', score: 0 },
+	{ id: 'player1', name: 'Player 1', score: 100 },
+	{ id: 'player2', name: 'Player 2', score: 100 },
+	{ id: 'player3', name: 'Player 3', score: 100 },
 ];
 
 export class GameStateManager {
@@ -80,11 +80,11 @@ export class GameStateManager {
 	}
 
 	/**
-	* Reset all scores to zero
+	* Reset all scores to initial value (100)
 	*/
 	resetScores(): void {
 		this.state.players.forEach(player => {
-			player.score = 0;
+			player.score = 100;
 		});
 		this.saveToStorage();
 	}

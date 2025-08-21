@@ -21,7 +21,7 @@ jest.mock('../WheelPointer', () => {
 });
 
 jest.mock('../SpinButton', () => {
-	return function MockSpinButton({ isSpinning, onSpin }: any) {
+	return function MockSpinButton({ isSpinning, onSpin }: { isSpinning: boolean; onSpin: () => void }) {
 		return (
 			<button 
 				data-testid="spin-button" 

@@ -13,9 +13,11 @@ export default function ScoreBoard({ players, onUpdateScore, onUpdatePlayerName 
     return (
         <div style={{ 
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+            gridTemplateColumns: 'repeat(3, 1fr)',
             gap: '2rem',
-            marginBottom: '2rem'
+            marginBottom: '2rem',
+            minHeight: '0',
+            width: '100%'
         }}>
             {players.map((player, index) => (
                 <div 
