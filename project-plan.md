@@ -108,7 +108,7 @@ python app.py
 ### Step 3: V2 Setup (React + Flask)
 ```bash
 # Backend setup
-cd gameshow-V2/backend
+cd gameshow-V2/server
 python3 -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
@@ -118,7 +118,7 @@ cd gameshow-V2/frontend
 npm install
 
 # Run both (in separate terminals)
-# Terminal 1: python app.py (in backend folder)
+# Terminal 1: python app.py (in server folder)
 # Terminal 2: npm run dev (in frontend folder)
 ```
 
@@ -265,7 +265,7 @@ gameshow-V2/
 │   │   └── styles/         # CSS modules
 │   ├── package.json
 │   └── next.config.js
-└── backend/                # Simple Flask server
+└── server/                 # Simple Flask server
     ├── app.py              # Main Flask app (same as V1)
     ├── game_state.py       # Score tracking (same as V1)
     ├── wheel_logic.py      # Wheel mechanics (same as V1)
@@ -302,8 +302,9 @@ gameshow-V2/
 
 ### Phase 1: Backend Migration (Day 1) ✅ COMPLETED
 1. **Copy Existing Backend** ✅
-   - ✅ Copied V1 Flask server to V2 backend folder
+   - ✅ Copied V1 Flask server to V2 server folder
    - ✅ Files copied: app.py, game_state.py, wheel_logic.py, requirements.txt
+   - ✅ Fixed import paths and changed port to 5001 (avoiding macOS AirPlay conflict)
    - ✅ Same endpoints maintained for compatibility
 
 ### Phase 2: Frontend Setup (Day 2-3) ✅ COMPLETED  
@@ -408,6 +409,7 @@ gameshow-V2/
 - Development environment setup
 
 ### 🔄 Next Steps
+- Update Next.js proxy configuration to point to port 5001
 - Connect frontend to backend APIs
 - Test full application flow
 - Cross-platform testing and optimization

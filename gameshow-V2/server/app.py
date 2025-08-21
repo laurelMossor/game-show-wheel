@@ -5,8 +5,8 @@ Runs the Flask server for the game show interface
 """
 
 from flask import Flask, render_template, jsonify, request
-from server.game_state import GameState
-from server.wheel_logic import WheelLogic
+from game_state import GameState
+from wheel_logic import WheelLogic
 import os
 
 # Initialize Flask app
@@ -70,7 +70,11 @@ def get_wheel_segments():
 
 if __name__ == '__main__':
     # Development mode
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    print("🎮 Starting Game Show Server...")
+    print("📊 Score tracking available at: http://localhost:5001")
+    print("🎯 Spinning wheel available at: http://localhost:5001/wheel")
+    print("⌨️  Press Ctrl+C to stop the server")
+    app.run(host='0.0.0.0', port=5001, debug=True)
 else:
-    # Production mode (for Pi deployment)
-    app.run(host='0.0.0.0', port=5000, debug=False)
+    # Production mode
+    app.run(host='0.0.0.0', port=5001, debug=False)

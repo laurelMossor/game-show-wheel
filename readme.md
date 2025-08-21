@@ -50,20 +50,20 @@ Frontend will run at `http://localhost:3000`
 
 #### Backend Setup  
 ```bash
-cd gameshow-V2/backend
+cd gameshow-V2/server
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 python app.py
 ```
-Backend API will run at `http://localhost:5000`
+Backend API will run at `http://localhost:5001`
 
 #### Full Development Setup
 Run both frontend and backend simultaneously:
 
 **Terminal 1 (Backend):**
 ```bash
-cd gameshow-V2/backend
+cd gameshow-V2/server
 source venv/bin/activate
 python app.py
 ```
@@ -117,7 +117,7 @@ game-show-wheel/
 │   ├── static/
 │   └── templates/
 ├── gameshow-V2/            # V2 - React refactor
-│   ├── backend/            # Flask API server
+│   ├── server/             # Flask API server
 │   │   ├── app.py
 │   │   ├── game_state.py
 │   │   ├── wheel_logic.py
