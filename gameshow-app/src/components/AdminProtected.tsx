@@ -34,3 +34,5 @@ export default function AdminProtected({ children }: AdminProtectedProps) {
 	// Show protected content if authenticated
 	return <>{children}</>;
 }
+
+
