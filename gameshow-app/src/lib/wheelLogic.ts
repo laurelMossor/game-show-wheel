@@ -5,9 +5,8 @@
 
 import { WheelSegment, SpinResult, WheelConfig } from '@/types/game';
 
-// Default wheel segments configuration from V1
-// is this a duplicate of the segments in the V2 wheel?
-const DEFAULT_SEGMENTS: Omit<WheelSegment, 'color'>[] = [
+// Original wheel segments configuration from V1 (preserved for posterity)
+const ORIGINAL_SEGMENTS: Omit<WheelSegment, 'color'>[] = [
 	{ id: 0, text: "New Rule", action: "new_rule", angle: 0 },
 	{ id: 1, text: "New Rule", action: "new_rule", angle: 30 },
 	{ id: 2, text: "New Rule", action: "new_rule", angle: 60 },
@@ -21,6 +20,16 @@ const DEFAULT_SEGMENTS: Omit<WheelSegment, 'color'>[] = [
 	{ id: 10, text: "Modify: Swap", action: "swap", angle: 300 }
 ];
 
+// New wheel segments configuration with 6 sections
+const DEFAULT_SEGMENTS: Omit<WheelSegment, 'color'>[] = [
+	{ id: 0, text: "Destroy Rule (self)", action: "destroy_rule_self", angle: 0 },
+	{ id: 1, text: "Audience Choice", action: "audience_choice", angle: 60 },
+	{ id: 2, text: "Swap", action: "swap", angle: 120 },
+	{ id: 3, text: "Shift 1 to Right", action: "shift_1_right", angle: 180 },
+	{ id: 4, text: "Opposite Rule", action: "opposite_rule", angle: 240 },
+	{ id: 5, text: "Destroy Rule (other)", action: "destroy_rule_other", angle: 300 }
+];
+
 // Soft color palette for wheel segments
 const SOFT_COLORS = [
 	'#F8F9FA',  // Very light white
@@ -28,12 +37,7 @@ const SOFT_COLORS = [
 	'#F5F5DC',  // Light beige
 	'#F0E68C',  // Light khaki
 	'#F0F8FF',  // Light azure
-	'#F0FFF0',  // Light honeydew
-	'#F5FFFA',  // Light mint cream
-	'#FFF8DC',  // Light cornsilk
-	'#FDF5E6',  // Light old lace
-	'#F0F8FF',  // Light alice blue
-	'#F5F5F5'   // Light gray
+	'#F0FFF0'   // Light honeydew
 ];
 
 // Configuration constants

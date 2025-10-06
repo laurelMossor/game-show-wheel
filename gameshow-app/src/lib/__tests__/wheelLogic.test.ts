@@ -14,13 +14,13 @@ describe('WheelManager', () => {
 
 	describe('Basic Initialization', () => {
 		/** 
-		 * Validates WheelManager constructor creates 11 default segments from DEFAULT_SEGMENTS array,
+		 * Validates WheelManager constructor creates 6 default segments from DEFAULT_SEGMENTS array,
 		 * ensuring each segment object contains required properties (id, text, action, color, angle)
 		 * for proper wheel rendering and game logic functionality.
 		 */
 		test('should initialize with default segments', () => {
 			const segments = wheel.getSegments();
-			expect(segments).toHaveLength(11);
+			expect(segments).toHaveLength(6);
 			expect(segments[0]).toHaveProperty('id');
 			expect(segments[0]).toHaveProperty('text');
 			expect(segments[0]).toHaveProperty('action');

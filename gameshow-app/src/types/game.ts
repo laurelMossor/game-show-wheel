@@ -45,7 +45,11 @@ export type GameAction =
 	| 'challenge'
 	| 'duplicate'
 	| 'reverse'
-	| 'swap';
+	| 'swap'
+	| 'destroy_rule_self'
+	| 'shift_1_right'
+	| 'opposite_rule'
+	| 'destroy_rule_other';
 
 export interface ScoreUpdate {
 	playerId: string;

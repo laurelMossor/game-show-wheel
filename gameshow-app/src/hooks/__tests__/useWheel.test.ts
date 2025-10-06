@@ -7,7 +7,7 @@ import { renderHook, act } from '@testing-library/react';
 import { useWheel } from '../useWheel';
 
 describe('useWheel Hook', () => {
-	/** 
+	/**
 	 * Tests hook initialization by calling wheelManager.getConfig() and verifying React state
 	 * properly reflects WheelManager's segments array, canvas configuration, spin settings,
 	 * and initial spinning/result states via useState and useCallback implementations.
@@ -15,7 +15,7 @@ describe('useWheel Hook', () => {
 	test('should initialize with wheel segments', () => {
 		const { result } = renderHook(() => useWheel());
 		
-		expect(result.current.segments).toHaveLength(11);
+		expect(result.current.segments).toHaveLength(6);
 		expect(result.current.segments[0]).toHaveProperty('id');
 		expect(result.current.segments[0]).toHaveProperty('text');
 		expect(result.current.segments[0]).toHaveProperty('action');
