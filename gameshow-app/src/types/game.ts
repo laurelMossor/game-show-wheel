@@ -3,6 +3,20 @@
 * Centralized type definitions for the game show app
 */
 
+export type GameAction = 
+	| 'new_rule'
+	| 'audience_choice'
+	| 'challenge'
+	| 'duplicate'
+	| 'reverse'
+	| 'swap'
+	| 'destroy_rule_self'
+	| 'shift_1_right'
+	| 'opposite_rule'
+	| 'destroy_rule_other'
+	| 'new_rule_self'
+	| 'new_rule_other';
+
 export interface Player {
 	id: string;
 	name: string;
@@ -12,7 +26,7 @@ export interface Player {
 export interface WheelSegment {
 	id: number;
 	text: string;
-	action: string;
+	action: GameAction;
 	color: string;
 	angle: number;
 }
@@ -38,18 +52,6 @@ export interface WheelConfig {
 	minSpins: number;
 	maxSpins: number;
 }
-
-export type GameAction = 
-	| 'new_rule'
-	| 'audience_choice'
-	| 'challenge'
-	| 'duplicate'
-	| 'reverse'
-	| 'swap'
-	| 'destroy_rule_self'
-	| 'shift_1_right'
-	| 'opposite_rule'
-	| 'destroy_rule_other';
 
 export interface ScoreUpdate {
 	playerId: string;

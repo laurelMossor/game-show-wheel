@@ -3,32 +3,11 @@
 * Handles spinning wheel mechanics, segments, and results
 */
 
-import { WheelSegment, SpinResult, WheelConfig } from '@/types/game';
+import { WheelSegment, SpinResult, WheelConfig, GameAction } from '@/types/game';
+import { WHEEL_CONFIG_8_SEGMENTS } from './wheelConfigurations';
 
-// Original wheel segments configuration from V1 (preserved for posterity)
-const ORIGINAL_SEGMENTS: Omit<WheelSegment, 'color'>[] = [
-	{ id: 0, text: "New Rule", action: "new_rule", angle: 0 },
-	{ id: 1, text: "New Rule", action: "new_rule", angle: 30 },
-	{ id: 2, text: "New Rule", action: "new_rule", angle: 60 },
-	{ id: 3, text: "Modify: Audience Choice", action: "audience_choice", angle: 90 },
-	{ id: 4, text: "Modify: Audience Choice", action: "audience_choice", angle: 120 },
-	{ id: 5, text: "Challenge", action: "challenge", angle: 150 },
-	{ id: 6, text: "Challenge", action: "challenge", angle: 180 },
-	{ id: 7, text: "Challenge", action: "challenge", angle: 210 },
-	{ id: 8, text: "Modify: Duplicate", action: "duplicate", angle: 240 },
-	{ id: 9, text: "Modify: Reverse", action: "reverse", angle: 270 },
-	{ id: 10, text: "Modify: Swap", action: "swap", angle: 300 }
-];
-
-// New wheel segments configuration with 6 sections
-const DEFAULT_SEGMENTS: Omit<WheelSegment, 'color'>[] = [
-	{ id: 0, text: "Destroy Rule (self)", action: "destroy_rule_self", angle: 0 },
-	{ id: 1, text: "Audience Choice", action: "audience_choice", angle: 60 },
-	{ id: 2, text: "Swap", action: "swap", angle: 120 },
-	{ id: 3, text: "Shift 1 to Right", action: "shift_1_right", angle: 180 },
-	{ id: 4, text: "Opposite Rule", action: "opposite_rule", angle: 240 },
-	{ id: 5, text: "Destroy Rule (other)", action: "destroy_rule_other", angle: 300 }
-];
+// Default wheel segments configuration with 8 sections (using utility function)
+const DEFAULT_SEGMENTS: Omit<WheelSegment, 'color'>[] = generateWheelSegments(WHEEL_CONFIG_8_SEGMENTS);
 
 // Soft color palette for wheel segments
 const SOFT_COLORS = [
@@ -37,8 +16,36 @@ const SOFT_COLORS = [
 	'#F5F5DC',  // Light beige
 	'#F0E68C',  // Light khaki
 	'#F0F8FF',  // Light azure
-	'#F0FFF0'   // Light honeydew
+	'#F0FFF0',  // Light honeydew
+	'#F5FFFA',  // Light mint cream
+	'#FFF8DC',  // Light cornsilk
+	'#FDF5E6',  // Light old lace
+	'#F0F8FF',  // Light alice blue
+	'#F5F5F5',  // Light gray
+	'#FFE4E1',  // Light misty rose
+	'#F0FFFF'   // Light azure
 ];
+
+/**
+ * Utility function to generate wheel segments with dynamic count and auto-calculated angles
+ * @param segmentConfigs Array of segment configurations (text, action, id)
+ * @param startAngle Starting angle for the first segment (default: 0)
+ * @returns Array of wheel segments with calculated angles and random colors
+ */
+export function generateWheelSegments(
+	segmentConfigs: Array<{ text: string; action: GameAction; id?: number }>,
+	startAngle: number = 0
+): Omit<WheelSegment, 'color'>[] {
+	const segmentCount = segmentConfigs.length;
+	const segmentAngle = 360 / segmentCount;
+	
+	return segmentConfigs.map((config, index) => ({
+		id: config.id ?? index,
+		text: config.text,
+		action: config.action,
+		angle: startAngle + (index * segmentAngle)
+	}));
+}
 
 // Configuration constants
 const DEFAULT_CONFIG: WheelConfig = {
@@ -241,6 +248,23 @@ export class WheelManager {
 		this.config = { ...DEFAULT_CONFIG };
 		this.initializeSegments();
 		this.isSpinning = false;
+	}
+
+	/**
+	* Set wheel configuration with any number of segments
+	* Automatically calculates angles based on the number of segments provided
+	* @param segmentConfigs Array of segment configurations (text, action, optional id)
+	* @param startAngle Optional starting angle for the first segment (default: 0)
+	*/
+	setWheelSegments(
+		segmentConfigs: Array<{ text: string; action: GameAction; id?: number }>,
+		startAngle: number = 0
+	): void {
+		const segments = generateWheelSegments(segmentConfigs, startAngle);
+		this.config.segments = segments.map((segment) => ({
+			...segment,
+			color: this.getRandomSoftColor()
+		}));
 	}
 
 	/**
