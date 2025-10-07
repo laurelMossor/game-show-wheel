@@ -4,10 +4,10 @@
 */
 
 import { WheelSegment, SpinResult, WheelConfig, GameAction } from '@/types/game';
-import { WHEEL_CONFIG_8_SEGMENTS } from './wheelConfigurations';
+import { WHEEL_CONFIG_8_SEGMENTS, FUN_TIME_WHEEL_CONFIG } from './wheelConfigurations';
 
 // Default wheel segments configuration with 8 sections (using utility function)
-const DEFAULT_SEGMENTS: Omit<WheelSegment, 'color'>[] = generateWheelSegments(WHEEL_CONFIG_8_SEGMENTS);
+const DEFAULT_SEGMENTS: Omit<WheelSegment, 'color'>[] = generateWheelSegments(FUN_TIME_WHEEL_CONFIG);
 
 // Soft color palette for wheel segments
 const SOFT_COLORS = [

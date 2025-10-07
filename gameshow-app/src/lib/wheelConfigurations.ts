@@ -53,6 +53,18 @@ export const WHEEL_CONFIG_8_SEGMENTS: WheelSegmentConfig[] = [
 	{ text: "New Rule (other)", action: "new_rule_other" }
 ];
 
+export const FUN_TIME_WHEEL_CONFIG: WheelSegmentConfig[] = [
+	{ text: "Destroy Rule (self)", action: "destroy_rule_self" },
+	{ text: "Audience Choice", action: "audience_choice" },
+	{ text: "Swap", action: "swap" },
+	{ text: "Shift (ONE) to Right", action: "shift_1_right" },
+	{ text: "Opposite Rule", action: "opposite_rule" },
+	{ text: "Destroy Rule (other)", action: "destroy_rule_other" },
+	{ text: "New Rule (self)", action: "new_rule_self" },
+	{ text: "New Rule (other)", action: "new_rule_other" },
+    { text: "Destroy Rule (any)", action: "destroy_rule_self" }
+];
+
 /**
  * 12-Segment Wheel Configuration
  * Comprehensive wheel with all action types
